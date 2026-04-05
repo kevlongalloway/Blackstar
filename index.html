@@ -74,7 +74,37 @@
     }
 
     .hero-logo {
+      position: relative;
       width: min(680px, 82vw);
+    }
+
+    .logo-sizer {
+      width: 100%;
+      display: block;
+      visibility: hidden;
+    }
+
+    .logo-clip {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      clip-path: inset(0 var(--cr) 0 var(--cl));
+      animation: clip-slam 0.2s cubic-bezier(0.6, 0, 0.1, 1) var(--d) both;
+    }
+
+    @keyframes clip-slam {
+      0% {
+        opacity: 0;
+        transform: translateY(-22px) rotate(calc(var(--rot) * 2)) scale(1.04);
+      }
+      65% {
+        opacity: 1;
+        transform: translateY(1px) rotate(var(--rot)) scale(0.995);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) rotate(var(--rot)) scale(1);
+      }
     }
 
     .hero-sub {
@@ -312,7 +342,18 @@
   </nav>
 
   <section class="hero">
-    <img class="hero-logo" src="IMG_1309.png" alt="BLACKSTAR">
+    <div class="hero-logo" aria-label="BLACKSTAR">
+      <img class="logo-sizer" src="IMG_1309.png" alt="BLACKSTAR">
+      <img class="logo-clip" src="IMG_1309.png" alt="" style="--cl:0%;     --cr:88.89%; --rot:-1.8deg; --d:0.00s">
+      <img class="logo-clip" src="IMG_1309.png" alt="" style="--cl:11.11%; --cr:77.78%; --rot: 0.7deg; --d:0.07s">
+      <img class="logo-clip" src="IMG_1309.png" alt="" style="--cl:22.22%; --cr:66.67%; --rot:-0.5deg; --d:0.14s">
+      <img class="logo-clip" src="IMG_1309.png" alt="" style="--cl:33.33%; --cr:55.56%; --rot: 1.4deg; --d:0.21s">
+      <img class="logo-clip" src="IMG_1309.png" alt="" style="--cl:44.44%; --cr:44.44%; --rot:-1.1deg; --d:0.28s">
+      <img class="logo-clip" src="IMG_1309.png" alt="" style="--cl:55.56%; --cr:33.33%; --rot: 1.6deg; --d:0.35s">
+      <img class="logo-clip" src="IMG_1309.png" alt="" style="--cl:66.67%; --cr:22.22%; --rot:-0.4deg; --d:0.42s">
+      <img class="logo-clip" src="IMG_1309.png" alt="" style="--cl:77.78%; --cr:11.11%; --rot: 0.8deg; --d:0.49s">
+      <img class="logo-clip" src="IMG_1309.png" alt="" style="--cl:88.89%; --cr:0%;     --rot:-1.3deg; --d:0.56s">
+    </div>
     <p class="hero-sub">SS26 — Now Available</p>
     <img class="hero-icon" src="IMG_1306.jpeg" alt="">
     <span class="scroll-hint">Scroll</span>
