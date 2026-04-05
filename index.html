@@ -257,35 +257,7 @@
     <p class="shop-label">— Current Drop</p>
     <h2 class="shop-title">THE<br>VOID<br>SERIES</h2>
 
-    <div class="grid">
-      <a href="#" class="card">
-        <div class="card-img">
-          <img src="IMG_1306.jpeg" alt="">
-        </div>
-        <div class="card-info">
-          <span class="card-name">Void Hoodie</span>
-          <span class="card-price">$185</span>
-        </div>
-      </a>
-      <a href="#" class="card">
-        <div class="card-img">
-          <img src="IMG_1306.jpeg" alt="">
-        </div>
-        <div class="card-info">
-          <span class="card-name">Star Tee</span>
-          <span class="card-price">$65</span>
-        </div>
-      </a>
-      <a href="#" class="card">
-        <div class="card-img">
-          <img src="IMG_1306.jpeg" alt="">
-        </div>
-        <div class="card-info">
-          <span class="card-name">Cargo Pant</span>
-          <span class="card-price">$225</span>
-        </div>
-      </a>
-    </div>
+    <div class="grid" id="products-grid"></div>
   </section>
 
   <footer>
@@ -300,6 +272,40 @@
     </div>
     <p class="footer-copy">© 2026 BLACKSTAR</p>
   </footer>
+
+  <script>
+    async function loadProducts() {
+      try {
+        const response = await fetch('products.json');
+        const products = await response.json();
+
+        const grid = document.getElementById('products-grid');
+
+        if (products.length === 0) {
+          grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; opacity: 0.5;">No products available. Run scraper to load products from Shopify.</p>';
+          return;
+        }
+
+        grid.innerHTML = products.map(product => `
+          <a href="${product.url}" class="card">
+            <div class="card-img">
+              ${product.image ? `<img src="${product.image}" alt="${product.title}">` : '<img src="IMG_1306.jpeg" alt="Product">'}
+            </div>
+            <div class="card-info">
+              <span class="card-name">${product.title}</span>
+              <span class="card-price">$${parseFloat(product.price).toFixed(2)}</span>
+            </div>
+          </a>
+        `).join('');
+      } catch (error) {
+        console.error('Failed to load products:', error);
+        document.getElementById('products-grid').innerHTML = '<p style="grid-column: 1/-1; text-align: center; opacity: 0.5;">Error loading products</p>';
+      }
+    }
+
+    // Load products when page loads
+    document.addEventListener('DOMContentLoaded', loadProducts);
+  </script>
 
 </body>
 </html>
