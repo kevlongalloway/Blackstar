@@ -1,1 +1,35 @@
-[]
+[
+  {
+    "id": "7844277485741",
+    "title": "Void Hoodie",
+    "price": "185.00",
+    "currency": "USD",
+    "image": "https://cdn.shopify.com/s/files/1/0614/8589/8821/products/void-hoodie.jpg",
+    "alt": "Void Hoodie",
+    "url": "/products/void-hoodie",
+    "handle": "void-hoodie",
+    "description": "Essential oversized hoodie from the Void Series"
+  },
+  {
+    "id": "7844277518509",
+    "title": "Star Tee",
+    "price": "65.00",
+    "currency": "USD",
+    "image": "https://cdn.shopify.com/s/files/1/0614/8589/8821/products/star-tee.jpg",
+    "alt": "Star Tee",
+    "url": "/products/star-tee",
+    "handle": "star-tee",
+    "description": "Classic t-shirt with embroidered star logo"
+  },
+  {
+    "id": "7844277551277",
+    "title": "Cargo Pant",
+    "price": "225.00",
+    "currency": "USD",
+    "image": "https://cdn.shopify.com/s/files/1/0614/8589/8821/products/cargo-pant.jpg",
+    "alt": "Cargo Pant",
+    "url": "/products/cargo-pant",
+    "handle": "cargo-pant",
+    "description": "Utility cargo pants with multiple pockets and adjustable straps"
+  }
+]

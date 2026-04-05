@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 /**
- * Shopify Product Scraper
- * Fetches products from Shopify store and saves them as JSON
+ * Shopify Product Web Scraper
+ * Scrapes products from Shopify storefront HTML
  *
  * Usage: node scraper.js
  * Or: npm run scrape
@@ -15,21 +15,21 @@ const path = require('path');
 const SHOPIFY_STORE = 'blackstarthebrand.myshopify.com';
 const PRODUCTS_FILE = path.join(__dirname, 'products.json');
 
-function fetchProducts(limit = 250) {
+function fetchHTML(urlPath = '/') {
   return new Promise((resolve, reject) => {
     const options = {
       hostname: SHOPIFY_STORE,
-      path: `/products.json?limit=${limit}`,
+      path: urlPath,
       method: 'GET',
-      timeout: 10000
+      timeout: 10000,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+      }
     };
 
     const req = https.request(options, (res) => {
-      // Handle redirects
-      if (res.statusCode === 301 || res.statusCode === 302) {
-        const redirectUrl = res.headers.location;
-        console.log(`Following redirect to: ${redirectUrl}`);
-        return reject(new Error(`Redirect not handled: ${redirectUrl}`));
+      if (res.statusCode === 404) {
+        return reject(new Error(`Page not found: ${urlPath}`));
       }
 
       if (res.statusCode !== 200) {
@@ -43,12 +43,7 @@ function fetchProducts(limit = 250) {
       });
 
       res.on('end', () => {
-        try {
-          const parsed = JSON.parse(data);
-          resolve(parsed.products || []);
-        } catch (error) {
-          reject(new Error(`Failed to parse JSON: ${error.message}`));
-        }
+        resolve(data);
       });
     });
 
@@ -57,58 +52,116 @@ function fetchProducts(limit = 250) {
       reject(new Error('Request timeout'));
     });
 
-    req.on('error', (error) => {
-      reject(error);
-    });
-
+    req.on('error', reject);
     req.end();
   });
 }
 
-function formatProducts(products) {
-  return products.map(product => {
-    const variant = product.variants?.[0];
-    const image = product.images?.[0];
+function extractProducts(html) {
+  const products = [];
 
-    return {
-      id: product.id,
-      title: product.title,
-      price: variant?.price || '0',
-      currency: variant?.currency_code || 'USD',
-      image: image?.src || '',
-      alt: image?.alt || product.title,
-      url: `/products/${product.handle}`,
-      handle: product.handle,
-      description: product.body_html || ''
-    };
-  });
+  // Match Shopify product data in the HTML
+  // Look for JSON-LD structured data or product listings
+
+  // Try to find Shopify's product JSON data in the page
+  const jsonLdMatch = html.match(/<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/);
+  if (jsonLdMatch) {
+    try {
+      const jsonLd = JSON.parse(jsonLdMatch[1]);
+      if (jsonLd['@type'] === 'Product' || jsonLd.itemListElement) {
+        const items = jsonLd.itemListElement || [jsonLd];
+        items.forEach(item => {
+          if (item.url || item.name) {
+            products.push({
+              title: item.name || 'Unknown',
+              price: item.offers?.price || '0',
+              image: item.image?.url || item.image || '',
+              url: item.url || '#',
+              id: Math.random().toString(36).substr(2, 9)
+            });
+          }
+        });
+      }
+    } catch (e) {
+      // Continue if JSON-LD parsing fails
+    }
+  }
+
+  // Fallback: Look for product grid items
+  if (products.length === 0) {
+    // Match common Shopify product HTML patterns
+    const productRegex = /<a[^>]*href="\/products\/([^"]*)"[^>]*>/g;
+    const titleRegex = /<h[2-3][^>]*>([^<]*)<\/h/;
+    const priceRegex = /\$?([\d,]+\.?\d*)/;
+
+    let match;
+    while ((match = productRegex.exec(html)) !== null) {
+      const url = `/products/${match[1]}`;
+      const section = html.substring(Math.max(0, match.index - 500), match.index + 500);
+      const titleMatch = section.match(titleRegex);
+      const priceMatch = section.match(priceRegex);
+
+      products.push({
+        id: Math.random().toString(36).substr(2, 9),
+        title: titleMatch ? titleMatch[1].trim() : 'Product',
+        price: priceMatch ? priceMatch[1] : '0',
+        image: '',
+        url: url
+      });
+    }
+  }
+
+  return products;
 }
 
 async function main() {
   try {
-    console.log(`Fetching products from https://${SHOPIFY_STORE}...`);
-    const products = await fetchProducts();
+    console.log(`Scraping products from https://${SHOPIFY_STORE}...`);
+    const html = await fetchHTML('/products');
 
-    if (products.length === 0) {
-      console.warn('⚠ No products found in response');
-      return;
+    if (!html) {
+      throw new Error('No HTML content received');
     }
 
-    const formatted = formatProducts(products);
+    const products = extractProducts(html);
 
-    fs.writeFileSync(PRODUCTS_FILE, JSON.stringify(formatted, null, 2));
-    console.log(`✓ Successfully scraped ${formatted.length} products`);
+    if (products.length === 0) {
+      console.warn('⚠ No products found. Trying alternate pages...');
+
+      // Try alternate endpoints
+      try {
+        const collectionHtml = await fetchHTML('/collections/all');
+        const collectionProducts = extractProducts(collectionHtml);
+
+        if (collectionProducts.length > 0) {
+          products.push(...collectionProducts);
+        }
+      } catch (e) {
+        console.warn('  - /collections/all not found');
+      }
+    }
+
+    if (products.length === 0) {
+      throw new Error('Could not extract any products from the store');
+    }
+
+    // Deduplicate by URL
+    const uniqueProducts = Array.from(new Map(products.map(p => [p.url, p])).values());
+
+    fs.writeFileSync(PRODUCTS_FILE, JSON.stringify(uniqueProducts, null, 2));
+    console.log(`✓ Successfully scraped ${uniqueProducts.length} products`);
     console.log(`✓ Saved to products.json`);
     console.log('\nSample products:');
-    formatted.slice(0, 3).forEach(p => {
-      console.log(`  - ${p.title} ($${parseFloat(p.price).toFixed(2)})`);
+    uniqueProducts.slice(0, 3).forEach(p => {
+      console.log(`  - ${p.title} ($${p.price})`);
     });
   } catch (error) {
     console.error(`✗ Error: ${error.message}`);
     console.error('\nTroubleshooting:');
     console.error('- Check that you have internet access');
     console.error('- Verify the Shopify store URL is correct');
-    console.error(`- The Shopify API endpoint should be: https://${SHOPIFY_STORE}/products.json`);
+    console.error('- Try visiting the store manually to confirm it\'s accessible');
+    console.error(`- The scraper tries: https://${SHOPIFY_STORE}/products`);
     process.exit(1);
   }
 }
