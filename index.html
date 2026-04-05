@@ -74,55 +74,39 @@
     }
 
     .hero-logo {
+      position: relative;
       width: min(680px, 82vw);
-      display: flex;
-      justify-content: center;
-      align-items: flex-end;
-      gap: 3px;
-      perspective: 500px;
-      perspective-origin: center 120%;
     }
 
-    .logo-char {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(50px, 11.5vw, 116px);
-      color: #0d0d0d;
-      background: #e9e3d4;
-      padding: 2px 5px 1px;
-      display: inline-block;
-      line-height: 0.92;
-      box-shadow: 2px 2px 0 rgba(0,0,0,0.55), 0 4px 12px rgba(0,0,0,0.22);
-      animation: char-lay-down 0.52s ease-out both;
-      transform-origin: bottom center;
+    .logo-sizer {
+      width: 100%;
+      display: block;
+      visibility: hidden;
     }
 
-    .logo-char:nth-child(even) { background: #ede8dc; }
+    .logo-clip {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      clip-path: inset(0 var(--cr) 0 var(--cl));
+      animation: clip-slam 0.27s cubic-bezier(0.2, 0, 0.1, 1) var(--d) both;
+    }
 
-    .logo-char:nth-child(1)  { animation-delay: 0.00s; }
-    .logo-char:nth-child(2)  { animation-delay: 0.08s; }
-    .logo-char:nth-child(3)  { animation-delay: 0.16s; }
-    .logo-char:nth-child(4)  { animation-delay: 0.24s; }
-    .logo-char:nth-child(5)  { animation-delay: 0.32s; }
-    .logo-char:nth-child(6)  { animation-delay: 0.40s; }
-    .logo-char:nth-child(7)  { animation-delay: 0.48s; }
-    .logo-char:nth-child(8)  { animation-delay: 0.56s; }
-    .logo-char:nth-child(9)  { animation-delay: 0.64s; }
-
-    @keyframes char-lay-down {
+    @keyframes clip-slam {
       0% {
         opacity: 0;
-        transform: rotateX(85deg) translateY(-6px);
+        transform: translateY(-55px) rotate(calc(var(--rot) * 4)) scale(1.1);
       }
-      58% {
+      52% {
         opacity: 1;
-        transform: rotateX(-13deg) translateY(2px);
+        transform: translateY(5px) rotate(calc(var(--rot) * 0.5)) scale(0.96);
       }
-      78% {
-        transform: rotateX(5deg) translateY(-1px);
+      72% {
+        transform: translateY(-2px) rotate(var(--rot)) scale(1.015);
       }
       100% {
         opacity: 1;
-        transform: rotateX(0deg) rotate(var(--rot, 0deg));
+        transform: translateY(0) rotate(var(--rot)) scale(1);
       }
     }
 
@@ -362,15 +346,16 @@
 
   <section class="hero">
     <div class="hero-logo" aria-label="BLACKSTAR">
-      <span class="logo-char" style="--rot:-1.8deg">B</span>
-      <span class="logo-char" style="--rot:0.7deg">L</span>
-      <span class="logo-char" style="--rot:-0.6deg">A</span>
-      <span class="logo-char" style="--rot:1.3deg">C</span>
-      <span class="logo-char" style="--rot:-1.0deg">K</span>
-      <span class="logo-char" style="--rot:1.5deg">S</span>
-      <span class="logo-char" style="--rot:-0.4deg">T</span>
-      <span class="logo-char" style="--rot:0.9deg">A</span>
-      <span class="logo-char" style="--rot:-1.2deg">R</span>
+      <img class="logo-sizer" src="IMG_1309.png" alt="BLACKSTAR">
+      <img class="logo-clip" src="IMG_1309.png" alt="" style="--cl:0%;     --cr:88.89%; --rot:-1.8deg; --d:0.00s">
+      <img class="logo-clip" src="IMG_1309.png" alt="" style="--cl:11.11%; --cr:77.78%; --rot: 0.7deg; --d:0.07s">
+      <img class="logo-clip" src="IMG_1309.png" alt="" style="--cl:22.22%; --cr:66.67%; --rot:-0.5deg; --d:0.14s">
+      <img class="logo-clip" src="IMG_1309.png" alt="" style="--cl:33.33%; --cr:55.56%; --rot: 1.4deg; --d:0.21s">
+      <img class="logo-clip" src="IMG_1309.png" alt="" style="--cl:44.44%; --cr:44.44%; --rot:-1.1deg; --d:0.28s">
+      <img class="logo-clip" src="IMG_1309.png" alt="" style="--cl:55.56%; --cr:33.33%; --rot: 1.6deg; --d:0.35s">
+      <img class="logo-clip" src="IMG_1309.png" alt="" style="--cl:66.67%; --cr:22.22%; --rot:-0.4deg; --d:0.42s">
+      <img class="logo-clip" src="IMG_1309.png" alt="" style="--cl:77.78%; --cr:11.11%; --rot: 0.8deg; --d:0.49s">
+      <img class="logo-clip" src="IMG_1309.png" alt="" style="--cl:88.89%; --cr:0%;     --rot:-1.3deg; --d:0.56s">
     </div>
     <p class="hero-sub">SS26 — Now Available</p>
     <img class="hero-icon" src="IMG_1306.jpeg" alt="">
