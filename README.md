@@ -78,15 +78,37 @@ Each product in `products.json` includes:
 - Run the scraper: `npm run scrape`
 - Check that it completes successfully
 
-## Automation
+## Deployment on Render
 
-To run the scraper automatically on a schedule, you can:
+### Option 1: GitHub Actions (Recommended)
+1. GitHub Actions will automatically run the scraper daily at 2 AM UTC
+2. It will commit updated products back to your repo
+3. No additional Render configuration needed
+
+### Option 2: Render Cron Job
+The `render.yaml` file includes a cron job configuration:
+1. Push changes to your repo
+2. Connect your repo to Render
+3. Render will automatically set up:
+   - Web service for the static site
+   - Cron job that runs the scraper daily
+
+### Option 3: Background Worker
+For continuous scraping every 6 hours:
+```bash
+npm run worker
+```
+
+Deploy to Render as a background service with the start command: `npm run worker`
+
+## Local Automation
+
+To run the scraper automatically on your local machine:
 - Use a cron job on Linux/Mac:
   ```bash
-  0 0 * * * cd /path/to/Blackstar && npm run scrape
+  0 2 * * * cd /path/to/Blackstar && npm run scrape
   ```
-- Use GitHub Actions to run on schedule
-- Deploy to a server with a scheduled task
+- Use Windows Task Scheduler for Windows machines
 
 ## API Reference
 
