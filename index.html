@@ -89,20 +89,17 @@
       top: 0; left: 0;
       width: 100%;
       clip-path: inset(0 var(--cr) 0 var(--cl));
-      animation: clip-slam 0.27s cubic-bezier(0.2, 0, 0.1, 1) var(--d) both;
+      animation: clip-slam 0.2s cubic-bezier(0.6, 0, 0.1, 1) var(--d) both;
     }
 
     @keyframes clip-slam {
       0% {
         opacity: 0;
-        transform: translateY(-55px) rotate(calc(var(--rot) * 4)) scale(1.1);
+        transform: translateY(-22px) rotate(calc(var(--rot) * 2)) scale(1.04);
       }
-      52% {
+      65% {
         opacity: 1;
-        transform: translateY(5px) rotate(calc(var(--rot) * 0.5)) scale(0.96);
-      }
-      72% {
-        transform: translateY(-2px) rotate(var(--rot)) scale(1.015);
+        transform: translateY(1px) rotate(var(--rot)) scale(0.995);
       }
       100% {
         opacity: 1;
