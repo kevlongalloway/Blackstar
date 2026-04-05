@@ -8,26 +8,32 @@
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-    html { overflow-x: hidden; }
+    html, body {
+      max-width: 100%;
+      overflow-x: hidden;
+    }
 
     body {
       background: #080808;
       color: #f0ede8;
       font-family: 'Space Mono', monospace;
       cursor: crosshair;
-      overflow-x: hidden;
-      width: 100%;
     }
 
     /* Nav */
     nav {
       position: fixed;
-      top: 0; left: 0; right: 0;
+      top: 0; left: 0;
+      width: 100%;
       z-index: 100;
-      padding: 28px 40px;
+      padding: 28px 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+    }
+
+    @media (min-width: 640px) {
+      nav { padding: 28px 40px; }
     }
 
     .nav-mark {
@@ -62,6 +68,7 @@
       padding: 140px 24px 48px;
       border-bottom: 1px solid rgba(240,237,232,0.08);
       margin-bottom: 48px;
+      overflow: hidden;
     }
 
     @media (min-width: 640px) {
@@ -93,6 +100,7 @@
     /* Grid */
     .shop {
       padding: 0 24px 80px;
+      width: 100%;
     }
 
     @media (min-width: 640px) {
@@ -122,6 +130,7 @@
       text-decoration: none;
       color: inherit;
       display: block;
+      min-width: 0;
     }
 
     .card-img {
