@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BLACKSTAR</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #080808;
+      color: #f0ede8;
+      font-family: 'Space Mono', monospace;
+      cursor: crosshair;
+      overflow-x: hidden;
+    }
+
+    /* Nav */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 28px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-mark {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px;
+      letter-spacing: 0.2em;
+      opacity: 0.8;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+    }
+
+    .nav-links a {
+      font-size: 10px;
+      color: #f0ede8;
+      text-decoration: none;
+      letter-spacing: 0.2em;
+      opacity: 0.5;
+      text-transform: uppercase;
+      transition: opacity 0.2s;
+    }
+
+    .nav-links a:hover { opacity: 1; }
+
+    /* Hero */
+    .hero {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    .hero-logo {
+      width: min(680px, 82vw);
+    }
+
+    .hero-sub {
+      font-size: 10px;
+      letter-spacing: 0.4em;
+      opacity: 0.35;
+      margin-top: 40px;
+      text-transform: uppercase;
+    }
+
+    .hero-icon {
+      position: absolute;
+      bottom: 14%;
+      right: 7%;
+      width: 90px;
+      opacity: 0.06;
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 9px;
+      letter-spacing: 0.3em;
+      opacity: 0.25;
+      text-transform: uppercase;
+    }
+
+    /* Ticker */
+    .ticker {
+      overflow: hidden;
+      background: #f0ede8;
+      padding: 11px 0;
+      white-space: nowrap;
+    }
+
+    .ticker-inner {
+      display: inline-flex;
+      animation: tick 18s linear infinite;
+    }
+
+    .ticker-item {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 13px;
+      color: #080808;
+      padding: 0 32px;
+      letter-spacing: 0.15em;
+    }
+
+    @keyframes tick {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    /* Shop section */
+    .shop {
+      padding: 100px 40px;
+    }
+
+    .shop-label {
+      font-size: 9px;
+      letter-spacing: 0.35em;
+      opacity: 0.35;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .shop-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(56px, 9vw, 140px);
+      line-height: 0.92;
+      margin-bottom: 64px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+    }
+
+    .card {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .card-img {
+      aspect-ratio: 3/4;
+      background: #121212;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card:nth-child(2) { margin-top: 48px; }
+    .card:nth-child(3) { margin-top: -24px; }
+
+    .card-img img {
+      width: 38%;
+      opacity: 0.05;
+      transition: opacity 0.4s, transform 0.5s;
+    }
+
+    .card:hover .card-img img {
+      opacity: 0.1;
+      transform: scale(1.08);
+    }
+
+    .card-info {
+      padding: 14px 0 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .card-name { font-size: 12px; letter-spacing: 0.05em; }
+    .card-price { font-size: 11px; opacity: 0.45; }
+
+    /* Footer */
+    footer {
+      background: #f0ede8;
+      color: #080808;
+      padding: 60px 40px 36px;
+    }
+
+    .footer-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding-bottom: 40px;
+      border-bottom: 1px solid rgba(8,8,8,0.12);
+      margin-bottom: 28px;
+    }
+
+    footer img { width: 240px; }
+
+    .footer-links { display: flex; gap: 28px; }
+
+    .footer-links a {
+      font-size: 10px;
+      color: #080808;
+      text-decoration: none;
+      letter-spacing: 0.15em;
+      opacity: 0.4;
+      text-transform: uppercase;
+      transition: opacity 0.2s;
+    }
+
+    .footer-links a:hover { opacity: 1; }
+
+    .footer-copy {
+      font-size: 9px;
+      opacity: 0.3;
+      letter-spacing: 0.1em;
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <span class="nav-mark">BST★</span>
+    <div class="nav-links">
+      <a href="#">Shop</a>
+      <a href="#">Drops</a>
+      <a href="#">About</a>
+      <a href="#">Cart (0)</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <img class="hero-logo" src="IMG_1305.jpeg" alt="BLACKSTAR">
+    <p class="hero-sub">SS26 — Now Available</p>
+    <img class="hero-icon" src="IMG_1306.jpeg" alt="">
+    <span class="scroll-hint">Scroll</span>
+  </section>
+
+  <div class="ticker">
+    <div class="ticker-inner">
+      <span class="ticker-item">BLACKSTAR</span><span class="ticker-item">★</span>
+      <span class="ticker-item">NEW DROP</span><span class="ticker-item">★</span>
+      <span class="ticker-item">SS26</span><span class="ticker-item">★</span>
+      <span class="ticker-item">LIMITED</span><span class="ticker-item">★</span>
+      <span class="ticker-item">BLACKSTAR</span><span class="ticker-item">★</span>
+      <span class="ticker-item">NEW DROP</span><span class="ticker-item">★</span>
+      <span class="ticker-item">SS26</span><span class="ticker-item">★</span>
+      <span class="ticker-item">LIMITED</span><span class="ticker-item">★</span>
+    </div>
+  </div>
+
+  <section class="shop">
+    <p class="shop-label">— Current Drop</p>
+    <h2 class="shop-title">THE<br>VOID<br>SERIES</h2>
+
+    <div class="grid">
+      <a href="#" class="card">
+        <div class="card-img">
+          <img src="IMG_1306.jpeg" alt="">
+        </div>
+        <div class="card-info">
+          <span class="card-name">Void Hoodie</span>
+          <span class="card-price">$185</span>
+        </div>
+      </a>
+      <a href="#" class="card">
+        <div class="card-img">
+          <img src="IMG_1306.jpeg" alt="">
+        </div>
+        <div class="card-info">
+          <span class="card-name">Star Tee</span>
+          <span class="card-price">$65</span>
+        </div>
+      </a>
+      <a href="#" class="card">
+        <div class="card-img">
+          <img src="IMG_1306.jpeg" alt="">
+        </div>
+        <div class="card-info">
+          <span class="card-name">Cargo Pant</span>
+          <span class="card-price">$225</span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-top">
+      <img src="IMG_1304.jpeg" alt="BLACKSTAR">
+      <div class="footer-links">
+        <a href="#">Instagram</a>
+        <a href="#">TikTok</a>
+        <a href="#">Sizing</a>
+        <a href="#">Returns</a>
+      </div>
+    </div>
+    <p class="footer-copy">© 2026 BLACKSTAR</p>
+  </footer>
+
+</body>
+</html>
