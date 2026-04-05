@@ -80,30 +80,31 @@ Each product in `products.json` includes:
 
 ## Deployment on Render
 
-### Option 1: GitHub Actions (Recommended)
-1. GitHub Actions will automatically run the scraper daily at 2 AM UTC
-2. It will commit updated products back to your repo
-3. No additional Render configuration needed
+### Setup
 
-### Option 2: Render Cron Job
-The `render.yaml` file includes a cron job configuration:
-1. Push changes to your repo
-2. Connect your repo to Render
-3. Render will automatically set up:
-   - Web service for the static site
-   - Cron job that runs the scraper daily
+1. **Connect repo to Render**
+   - Push your code to GitHub
+   - Create a new Static Site on Render
+   - Connect your GitHub repo
+   - Render will detect `render.yaml` and deploy
 
-### Option 3: Background Worker
-For continuous scraping every 6 hours:
-```bash
-npm run worker
+2. **Automatic Product Updates via GitHub Actions**
+   - GitHub Actions runs the scraper daily at 2 AM UTC
+   - Commits updated `products.json` to your repo
+   - Render automatically redeploys with new products
+   - Site stays fully static—no server-side processing
+
+### How It Works
+
+```
+GitHub Actions (Daily) → Scrapes Shopify → Commits products.json → Render redeploys with new data
 ```
 
-Deploy to Render as a background service with the start command: `npm run worker`
+The site is 100% static HTML/CSS/JS served by Render, with products data automatically updated daily.
 
 ## Local Automation
 
-To run the scraper automatically on your local machine:
+To test the scraper locally:
 - Use a cron job on Linux/Mac:
   ```bash
   0 2 * * * cd /path/to/Blackstar && npm run scrape

@@ -2,16 +2,5 @@ services:
   - type: web
     name: blackstar-site
     plan: free
-    buildCommand: npm install
-    startCommand: npx serve -s . -l 3000
-    envVars:
-      - key: NODE_ENV
-        value: production
-
-jobs:
-  - type: cron
-    name: scrape-shopify-products
-    plan: free
-    schedule: "0 2 * * *"  # Daily at 2 AM UTC
-    buildCommand: npm install
-    startCommand: npm run scrape
+    staticSite: true
+    buildCommand: echo "Static site - no build needed"

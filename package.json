@@ -3,11 +3,6 @@
   "version": "1.0.0",
   "description": "BLACKSTAR - Fashion Brand Site",
   "scripts": {
-    "scrape": "node scraper.js",
-    "worker": "node worker.js",
-    "start": "npx serve -s . -l 3000"
-  },
-  "devDependencies": {
-    "serve": "^14.2.0"
+    "scrape": "node scraper.js"
   }
 }
