@@ -8,12 +8,17 @@
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
+    html {
+      overflow-x: hidden;
+    }
+
     body {
       background: #080808;
       color: #f0ede8;
       font-family: 'Space Mono', monospace;
       cursor: crosshair;
       overflow-x: hidden;
+      width: 100%;
     }
 
     /* Nav */
@@ -120,7 +125,18 @@
 
     /* Shop section */
     .shop {
-      padding: 100px 40px;
+      padding: 80px 24px;
+    }
+
+    @media (min-width: 640px) {
+      .shop { padding: 100px 40px; }
+    }
+
+    .shop-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 40px;
     }
 
     .shop-label {
@@ -128,66 +144,118 @@
       letter-spacing: 0.35em;
       opacity: 0.35;
       text-transform: uppercase;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
 
     .shop-title {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(56px, 9vw, 140px);
+      font-size: clamp(48px, 9vw, 120px);
       line-height: 0.92;
-      margin-bottom: 64px;
     }
+
+    .shop-all-link {
+      font-size: 9px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: #f0ede8;
+      text-decoration: none;
+      opacity: 0.45;
+      border-bottom: 1px solid rgba(240,237,232,0.25);
+      padding-bottom: 2px;
+      white-space: nowrap;
+      transition: opacity 0.2s;
+      flex-shrink: 0;
+      margin-bottom: 6px;
+    }
+
+    .shop-all-link:hover { opacity: 1; }
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 4px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    @media (min-width: 640px) {
+      .grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
     }
 
     .card {
       text-decoration: none;
       color: inherit;
+      display: block;
     }
 
     .card-img {
       aspect-ratio: 3/4;
       background: #121212;
-      position: relative;
       overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
-
-    .card:nth-child(2) { margin-top: 48px; }
-    .card:nth-child(3) { margin-top: -24px; }
 
     .card-img img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      opacity: 1;
-      transition: transform 0.5s;
+      transition: transform 0.5s ease;
     }
 
     .card:hover .card-img img {
-      transform: scale(1.08);
+      transform: scale(1.06);
     }
 
     .card-info {
-      padding: 14px 0 6px;
-      display: flex;
-      justify-content: space-between;
+      padding: 12px 2px 4px;
     }
 
-    .card-name { font-size: 12px; letter-spacing: 0.05em; }
-    .card-price { font-size: 11px; opacity: 0.45; }
+    .card-name {
+      display: block;
+      font-size: 10px;
+      letter-spacing: 0.04em;
+      margin-bottom: 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-price {
+      display: block;
+      font-size: 10px;
+      opacity: 0.45;
+    }
+
+    /* Shop all CTA */
+    .shop-cta {
+      margin-top: 48px;
+      text-align: center;
+    }
+
+    .shop-cta-btn {
+      display: inline-block;
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: #080808;
+      background: #f0ede8;
+      text-decoration: none;
+      padding: 14px 36px;
+      transition: opacity 0.2s;
+    }
+
+    .shop-cta-btn:hover { opacity: 0.75; }
 
     /* Footer */
     footer {
       background: #f0ede8;
       color: #080808;
-      padding: 60px 40px 36px;
+      padding: 60px 24px 36px;
+    }
+
+    @media (min-width: 640px) {
+      footer { padding: 60px 40px 36px; }
     }
 
     .footer-top {
@@ -197,11 +265,13 @@
       padding-bottom: 40px;
       border-bottom: 1px solid rgba(8,8,8,0.12);
       margin-bottom: 28px;
+      flex-wrap: wrap;
+      gap: 24px;
     }
 
-    footer img { width: 240px; }
+    footer img { width: 200px; }
 
-    .footer-links { display: flex; gap: 28px; }
+    .footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
 
     .footer-links a {
       font-size: 10px;
@@ -255,10 +325,19 @@
   </div>
 
   <section class="shop">
-    <p class="shop-label">— Current Drop</p>
-    <h2 class="shop-title">THE<br>VOID<br>SERIES</h2>
+    <div class="shop-header">
+      <div>
+        <p class="shop-label">— Current Drop</p>
+        <h2 class="shop-title">THE<br>VOID<br>SERIES</h2>
+      </div>
+      <a href="https://blackstarthebrand.myshopify.com/collections/all" class="shop-all-link" target="_blank">Shop All →</a>
+    </div>
 
     <div class="grid" id="products-grid"></div>
+
+    <div class="shop-cta">
+      <a href="https://blackstarthebrand.myshopify.com/collections/all" class="shop-cta-btn" target="_blank">View All Products</a>
+    </div>
   </section>
 
   <footer>
@@ -279,12 +358,13 @@
       try {
         const response = await fetch('products.json');
         const data = await response.json();
-        const products = Array.isArray(data) ? data : (data.products || []);
+        const allProducts = Array.isArray(data) ? data : (data.products || []);
+        const products = allProducts.slice(0, 6);
 
         const grid = document.getElementById('products-grid');
 
         if (products.length === 0) {
-          grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; opacity: 0.5;">No products available. Run scraper to load products from Shopify.</p>';
+          grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; opacity: 0.5;">No products available.</p>';
           return;
         }
 
@@ -295,11 +375,11 @@
           const price = product.price
             ? product.price
             : (product.variants && product.variants[0] ? product.variants[0].price : '0');
-          const url = product.url || `/products/${product.handle}`;
+          const url = `https://blackstarthebrand.myshopify.com/products/${product.handle}`;
           return `
-          <a href="${url}" class="card">
+          <a href="${url}" class="card" target="_blank">
             <div class="card-img">
-              ${image ? `<img src="${image}" alt="${product.title}">` : '<img src="IMG_1306.jpeg" alt="Product">'}
+              ${image ? `<img src="${image}" alt="${product.title}" loading="lazy">` : ''}
             </div>
             <div class="card-info">
               <span class="card-name">${product.title}</span>
@@ -313,7 +393,6 @@
       }
     }
 
-    // Load products when page loads
     document.addEventListener('DOMContentLoaded', loadProducts);
   </script>
 
