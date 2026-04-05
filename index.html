@@ -75,6 +75,55 @@
 
     .hero-logo {
       width: min(680px, 82vw);
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 3px;
+      perspective: 500px;
+      perspective-origin: center 120%;
+    }
+
+    .logo-char {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(50px, 11.5vw, 116px);
+      color: #0d0d0d;
+      background: #e9e3d4;
+      padding: 2px 5px 1px;
+      display: inline-block;
+      line-height: 0.92;
+      box-shadow: 2px 2px 0 rgba(0,0,0,0.55), 0 4px 12px rgba(0,0,0,0.22);
+      animation: char-lay-down 0.52s ease-out both;
+      transform-origin: bottom center;
+    }
+
+    .logo-char:nth-child(even) { background: #ede8dc; }
+
+    .logo-char:nth-child(1)  { animation-delay: 0.00s; }
+    .logo-char:nth-child(2)  { animation-delay: 0.08s; }
+    .logo-char:nth-child(3)  { animation-delay: 0.16s; }
+    .logo-char:nth-child(4)  { animation-delay: 0.24s; }
+    .logo-char:nth-child(5)  { animation-delay: 0.32s; }
+    .logo-char:nth-child(6)  { animation-delay: 0.40s; }
+    .logo-char:nth-child(7)  { animation-delay: 0.48s; }
+    .logo-char:nth-child(8)  { animation-delay: 0.56s; }
+    .logo-char:nth-child(9)  { animation-delay: 0.64s; }
+
+    @keyframes char-lay-down {
+      0% {
+        opacity: 0;
+        transform: rotateX(85deg) translateY(-6px);
+      }
+      58% {
+        opacity: 1;
+        transform: rotateX(-13deg) translateY(2px);
+      }
+      78% {
+        transform: rotateX(5deg) translateY(-1px);
+      }
+      100% {
+        opacity: 1;
+        transform: rotateX(0deg) rotate(var(--rot, 0deg));
+      }
     }
 
     .hero-sub {
@@ -312,7 +361,17 @@
   </nav>
 
   <section class="hero">
-    <img class="hero-logo" src="IMG_1309.png" alt="BLACKSTAR">
+    <div class="hero-logo" aria-label="BLACKSTAR">
+      <span class="logo-char" style="--rot:-1.8deg">B</span>
+      <span class="logo-char" style="--rot:0.7deg">L</span>
+      <span class="logo-char" style="--rot:-0.6deg">A</span>
+      <span class="logo-char" style="--rot:1.3deg">C</span>
+      <span class="logo-char" style="--rot:-1.0deg">K</span>
+      <span class="logo-char" style="--rot:1.5deg">S</span>
+      <span class="logo-char" style="--rot:-0.4deg">T</span>
+      <span class="logo-char" style="--rot:0.9deg">A</span>
+      <span class="logo-char" style="--rot:-1.2deg">R</span>
+    </div>
     <p class="hero-sub">SS26 — Now Available</p>
     <img class="hero-icon" src="IMG_1306.jpeg" alt="">
     <span class="scroll-hint">Scroll</span>
