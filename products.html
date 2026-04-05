@@ -3,14 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BLACKSTAR</title>
+  <title>Shop — BLACKSTAR</title>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-    html {
-      overflow-x: hidden;
-    }
+    html { overflow-x: hidden; }
 
     body {
       background: #080808;
@@ -37,6 +35,8 @@
       font-size: 18px;
       letter-spacing: 0.2em;
       opacity: 0.8;
+      text-decoration: none;
+      color: #f0ede8;
     }
 
     .nav-links {
@@ -55,91 +55,20 @@
     }
 
     .nav-links a:hover { opacity: 1; }
+    .nav-links a.active { opacity: 1; }
 
-    /* Hero */
-    .hero {
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      position: relative;
-    }
-
-    .hero-logo {
-      width: min(680px, 82vw);
-    }
-
-    .hero-sub {
-      font-size: 10px;
-      letter-spacing: 0.4em;
-      opacity: 0.35;
-      margin-top: 40px;
-      text-transform: uppercase;
-    }
-
-    .hero-icon {
-      position: absolute;
-      bottom: 14%;
-      right: 7%;
-      width: 90px;
-      opacity: 0.06;
-    }
-
-    .scroll-hint {
-      position: absolute;
-      bottom: 32px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 9px;
-      letter-spacing: 0.3em;
-      opacity: 0.25;
-      text-transform: uppercase;
-    }
-
-    /* Ticker */
-    .ticker {
-      overflow: hidden;
-      background: #f0ede8;
-      padding: 11px 0;
-      white-space: nowrap;
-    }
-
-    .ticker-inner {
-      display: inline-flex;
-      animation: tick 18s linear infinite;
-    }
-
-    .ticker-item {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 13px;
-      color: #080808;
-      padding: 0 32px;
-      letter-spacing: 0.15em;
-    }
-
-    @keyframes tick {
-      from { transform: translateX(0); }
-      to   { transform: translateX(-50%); }
-    }
-
-    /* Shop section */
-    .shop {
-      padding: 80px 24px;
+    /* Page header */
+    .page-header {
+      padding: 140px 24px 48px;
+      border-bottom: 1px solid rgba(240,237,232,0.08);
+      margin-bottom: 48px;
     }
 
     @media (min-width: 640px) {
-      .shop { padding: 100px 40px; }
+      .page-header { padding: 140px 40px 48px; }
     }
 
-    .shop-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      margin-bottom: 40px;
-    }
-
-    .shop-label {
+    .page-label {
       font-size: 9px;
       letter-spacing: 0.35em;
       opacity: 0.35;
@@ -147,28 +76,28 @@
       margin-bottom: 16px;
     }
 
-    .shop-title {
+    .page-title {
       font-family: 'Bebas Neue', sans-serif;
       font-size: clamp(48px, 9vw, 120px);
       line-height: 0.92;
     }
 
-    .shop-all-link {
+    .product-count {
       font-size: 9px;
-      letter-spacing: 0.25em;
+      letter-spacing: 0.2em;
+      opacity: 0.3;
+      margin-top: 20px;
       text-transform: uppercase;
-      color: #f0ede8;
-      text-decoration: none;
-      opacity: 0.45;
-      border-bottom: 1px solid rgba(240,237,232,0.25);
-      padding-bottom: 2px;
-      white-space: nowrap;
-      transition: opacity 0.2s;
-      flex-shrink: 0;
-      margin-bottom: 6px;
     }
 
-    .shop-all-link:hover { opacity: 1; }
+    /* Grid */
+    .shop {
+      padding: 0 24px 80px;
+    }
+
+    @media (min-width: 640px) {
+      .shop { padding: 0 40px 100px; }
+    }
 
     .grid {
       display: grid;
@@ -180,6 +109,12 @@
       .grid {
         grid-template-columns: repeat(3, 1fr);
         gap: 16px;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .grid {
+        grid-template-columns: repeat(4, 1fr);
       }
     }
 
@@ -226,26 +161,16 @@
       opacity: 0.45;
     }
 
-    /* Shop all CTA */
-    .shop-cta {
-      margin-top: 48px;
+    /* Loading / empty states */
+    .state-msg {
+      grid-column: 1 / -1;
       text-align: center;
-    }
-
-    .shop-cta-btn {
-      display: inline-block;
-      font-family: 'Space Mono', monospace;
-      font-size: 9px;
-      letter-spacing: 0.3em;
+      opacity: 0.4;
+      font-size: 10px;
+      letter-spacing: 0.15em;
       text-transform: uppercase;
-      color: #080808;
-      background: #f0ede8;
-      text-decoration: none;
-      padding: 14px 36px;
-      transition: opacity 0.2s;
+      padding: 60px 0;
     }
-
-    .shop-cta-btn:hover { opacity: 0.75; }
 
     /* Footer */
     footer {
@@ -295,48 +220,24 @@
 <body>
 
   <nav>
-    <span class="nav-mark">BST★</span>
+    <a class="nav-mark" href="index.html">BST★</a>
     <div class="nav-links">
-      <a href="products.html">Shop</a>
+      <a href="products.html" class="active">Shop</a>
       <a href="#">Drops</a>
       <a href="#">About</a>
       <a href="#">Cart (0)</a>
     </div>
   </nav>
 
-  <section class="hero">
-    <img class="hero-logo" src="IMG_1309.png" alt="BLACKSTAR">
-    <p class="hero-sub">SS26 — Now Available</p>
-    <img class="hero-icon" src="IMG_1306.jpeg" alt="">
-    <span class="scroll-hint">Scroll</span>
-  </section>
-
-  <div class="ticker">
-    <div class="ticker-inner">
-      <span class="ticker-item">BLACKSTAR</span><span class="ticker-item">★</span>
-      <span class="ticker-item">NEW DROP</span><span class="ticker-item">★</span>
-      <span class="ticker-item">SS26</span><span class="ticker-item">★</span>
-      <span class="ticker-item">LIMITED</span><span class="ticker-item">★</span>
-      <span class="ticker-item">BLACKSTAR</span><span class="ticker-item">★</span>
-      <span class="ticker-item">NEW DROP</span><span class="ticker-item">★</span>
-      <span class="ticker-item">SS26</span><span class="ticker-item">★</span>
-      <span class="ticker-item">LIMITED</span><span class="ticker-item">★</span>
-    </div>
+  <div class="page-header">
+    <p class="page-label">— All Products</p>
+    <h1 class="page-title">SHOP</h1>
+    <p class="product-count" id="product-count"></p>
   </div>
 
   <section class="shop">
-    <div class="shop-header">
-      <div>
-        <p class="shop-label">— Current Drop</p>
-        <h2 class="shop-title">THE<br>VOID<br>SERIES</h2>
-      </div>
-      <a href="products.html" class="shop-all-link">Shop All →</a>
-    </div>
-
-    <div class="grid" id="products-grid"></div>
-
-    <div class="shop-cta">
-      <a href="products.html" class="shop-cta-btn">View All Products</a>
+    <div class="grid" id="products-grid">
+      <p class="state-msg">Loading...</p>
     </div>
   </section>
 
@@ -358,15 +259,17 @@
       try {
         const response = await fetch('products.json');
         const data = await response.json();
-        const allProducts = Array.isArray(data) ? data : (data.products || []);
-        const products = allProducts.slice(0, 6);
+        const products = Array.isArray(data) ? data : (data.products || []);
 
         const grid = document.getElementById('products-grid');
+        const countEl = document.getElementById('product-count');
 
         if (products.length === 0) {
-          grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; opacity: 0.5;">No products available.</p>';
+          grid.innerHTML = '<p class="state-msg">No products available.</p>';
           return;
         }
+
+        countEl.textContent = `${products.length} item${products.length !== 1 ? 's' : ''}`;
 
         grid.innerHTML = products.map(product => {
           const image = product.image
@@ -389,7 +292,7 @@
         }).join('');
       } catch (error) {
         console.error('Failed to load products:', error);
-        document.getElementById('products-grid').innerHTML = '<p style="grid-column: 1/-1; text-align: center; opacity: 0.5;">Error loading products</p>';
+        document.getElementById('products-grid').innerHTML = '<p class="state-msg">Error loading products.</p>';
       }
     }
 
