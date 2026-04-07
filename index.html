@@ -28,6 +28,17 @@
       width: 100%;
     }
 
+    /* Scroll progress bar */
+    #scroll-bar {
+      position: fixed;
+      top: 0; left: 0;
+      height: 2px;
+      width: 0%;
+      background: #f0ede8;
+      z-index: 999;
+      transition: width 0.05s linear;
+    }
+
     /* Nav */
     nav {
       position: fixed;
@@ -37,6 +48,14 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      transition: background 0.4s ease, padding 0.4s ease, backdrop-filter 0.4s ease;
+    }
+
+    nav.scrolled {
+      background: rgba(8, 8, 8, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 18px 40px;
     }
 
     .nav-mark {
@@ -71,11 +90,13 @@
       justify-content: center;
       align-items: center;
       position: relative;
+      overflow: hidden;
     }
 
     .hero-logo {
       position: relative;
       width: min(680px, 82vw);
+      will-change: transform;
     }
 
     .logo-sizer {
@@ -110,9 +131,16 @@
     .hero-sub {
       font-size: 10px;
       letter-spacing: 0.4em;
-      opacity: 0.35;
+      opacity: 0;
       margin-top: 40px;
       text-transform: uppercase;
+      animation: fade-up 0.6s ease 0.8s forwards;
+      will-change: transform, opacity;
+    }
+
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 0.35; transform: translateY(0); }
     }
 
     .hero-icon {
@@ -121,6 +149,7 @@
       right: 7%;
       width: 90px;
       opacity: 0.06;
+      will-change: transform;
     }
 
     .scroll-hint {
@@ -130,8 +159,39 @@
       transform: translateX(-50%);
       font-size: 9px;
       letter-spacing: 0.3em;
-      opacity: 0.25;
+      opacity: 0;
       text-transform: uppercase;
+      animation: fade-up 0.6s ease 1.1s forwards;
+    }
+
+    /* Horizontal marquee line */
+    .marquee-line {
+      position: absolute;
+      bottom: 60px;
+      left: 0;
+      width: 100%;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .marquee-line-inner {
+      display: inline-flex;
+      white-space: nowrap;
+      animation: marquee-slow 30s linear infinite;
+    }
+
+    .marquee-line-item {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 9px;
+      letter-spacing: 0.4em;
+      color: #f0ede8;
+      opacity: 0.08;
+      padding: 0 24px;
+    }
+
+    @keyframes marquee-slow {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
     }
 
     /* Ticker */
@@ -190,22 +250,53 @@
       line-height: 0.92;
     }
 
+    /* Word-by-word title reveal */
+    .title-word {
+      display: block;
+      overflow: hidden;
+    }
+
+    .title-word-inner {
+      display: block;
+      transform: translateY(110%);
+      transition: transform 0.5s cubic-bezier(0.6, 0, 0.1, 1);
+    }
+
+    .title-word-inner.visible {
+      transform: translateY(0);
+    }
+
+    .shop-label {
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .shop-label.visible {
+      opacity: 0.35;
+      transform: translateY(0);
+    }
+
     .shop-all-link {
       font-size: 9px;
       letter-spacing: 0.25em;
       text-transform: uppercase;
       color: #f0ede8;
       text-decoration: none;
-      opacity: 0.45;
+      opacity: 0;
       border-bottom: 1px solid rgba(240,237,232,0.25);
       padding-bottom: 2px;
       white-space: nowrap;
-      transition: opacity 0.2s;
+      transition: opacity 0.4s ease 0.3s;
       flex-shrink: 0;
       margin-bottom: 6px;
     }
 
-    .shop-all-link:hover { opacity: 1; }
+    .shop-all-link:hover { opacity: 1 !important; }
+
+    .shop-all-link.visible {
+      opacity: 0.45;
+    }
 
     .grid {
       display: grid;
@@ -224,6 +315,14 @@
       text-decoration: none;
       color: inherit;
       display: block;
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.6, 0, 0.1, 1);
+    }
+
+    .card.visible {
+      opacity: 1;
+      transform: translateY(0);
     }
 
     .card-img {
@@ -236,11 +335,29 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: transform 0.5s ease;
+      transition: transform 0.6s cubic-bezier(0.25, 0, 0, 1);
     }
 
     .card:hover .card-img img {
-      transform: scale(1.06);
+      transform: scale(1.07);
+    }
+
+    /* Drag-reveal stripe on card hover */
+    .card-img::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, transparent 40%, rgba(240,237,232,0.04) 100%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .card-img {
+      position: relative;
+    }
+
+    .card:hover .card-img::after {
+      opacity: 1;
     }
 
     .card-info {
@@ -267,6 +384,14 @@
     .shop-cta {
       margin-top: 48px;
       text-align: center;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.5s ease 0.2s, transform 0.5s ease 0.2s;
+    }
+
+    .shop-cta.visible {
+      opacity: 1;
+      transform: translateY(0);
     }
 
     .shop-cta-btn {
@@ -280,9 +405,32 @@
       text-decoration: none;
       padding: 14px 36px;
       transition: opacity 0.2s;
+      position: relative;
+      overflow: hidden;
     }
 
-    .shop-cta-btn:hover { opacity: 0.75; }
+    .shop-cta-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: #080808;
+      transform: translateX(-101%);
+      transition: transform 0.35s cubic-bezier(0.6, 0, 0.1, 1);
+    }
+
+    .shop-cta-btn:hover::before {
+      transform: translateX(0);
+    }
+
+    .shop-cta-btn span {
+      position: relative;
+      z-index: 1;
+      transition: color 0.35s ease;
+    }
+
+    .shop-cta-btn:hover span {
+      color: #f0ede8;
+    }
 
     /* Footer */
     footer {
@@ -327,11 +475,25 @@
       opacity: 0.3;
       letter-spacing: 0.1em;
     }
+
+    /* Reveal base for misc elements */
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.6, 0, 0.1, 1);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
   </style>
 </head>
 <body>
 
-  <nav>
+  <div id="scroll-bar"></div>
+
+  <nav id="main-nav">
     <span class="nav-mark">BST★</span>
     <div class="nav-links">
       <a href="products.html">Shop</a>
@@ -342,7 +504,7 @@
   </nav>
 
   <section class="hero">
-    <div class="hero-logo" aria-label="BLACKSTAR">
+    <div class="hero-logo" id="hero-logo" aria-label="BLACKSTAR">
       <img class="logo-sizer" src="IMG_1309.png" alt="BLACKSTAR">
       <img class="logo-clip" src="IMG_1309.png" alt="" style="--cl:0%;     --cr:88.89%; --rot:-1.8deg; --d:0.00s">
       <img class="logo-clip" src="IMG_1309.png" alt="" style="--cl:11.11%; --cr:77.78%; --rot: 0.7deg; --d:0.07s">
@@ -355,8 +517,26 @@
       <img class="logo-clip" src="IMG_1309.png" alt="" style="--cl:88.89%; --cr:0%;     --rot:-1.3deg; --d:0.56s">
     </div>
     <p class="hero-sub">SS26 — Now Available</p>
-    <img class="hero-icon" src="IMG_1306.jpeg" alt="">
-    <span class="scroll-hint">Scroll</span>
+    <img class="hero-icon" id="hero-icon" src="IMG_1306.jpeg" alt="">
+
+    <div class="marquee-line">
+      <div class="marquee-line-inner">
+        <span class="marquee-line-item">BLACKSTAR THE BRAND</span>
+        <span class="marquee-line-item">★</span>
+        <span class="marquee-line-item">VOID SERIES SS26</span>
+        <span class="marquee-line-item">★</span>
+        <span class="marquee-line-item">LIMITED EDITION</span>
+        <span class="marquee-line-item">★</span>
+        <span class="marquee-line-item">BLACKSTAR THE BRAND</span>
+        <span class="marquee-line-item">★</span>
+        <span class="marquee-line-item">VOID SERIES SS26</span>
+        <span class="marquee-line-item">★</span>
+        <span class="marquee-line-item">LIMITED EDITION</span>
+        <span class="marquee-line-item">★</span>
+      </div>
+    </div>
+
+    <span class="scroll-hint">Scroll ↓</span>
   </section>
 
   <div class="ticker">
@@ -375,21 +555,25 @@
   <section class="shop">
     <div class="shop-header">
       <div>
-        <p class="shop-label">— Current Drop</p>
-        <h2 class="shop-title">THE<br>VOID<br>SERIES</h2>
+        <p class="shop-label" id="shop-label">— Current Drop</p>
+        <h2 class="shop-title" id="shop-title">
+          <span class="title-word"><span class="title-word-inner">THE</span></span>
+          <span class="title-word"><span class="title-word-inner">VOID</span></span>
+          <span class="title-word"><span class="title-word-inner">SERIES</span></span>
+        </h2>
       </div>
-      <a href="products.html" class="shop-all-link">Shop All →</a>
+      <a href="products.html" class="shop-all-link" id="shop-all-link">Shop All →</a>
     </div>
 
     <div class="grid" id="products-grid"></div>
 
-    <div class="shop-cta">
-      <a href="products.html" class="shop-cta-btn">View All Products</a>
+    <div class="shop-cta" id="shop-cta">
+      <a href="products.html" class="shop-cta-btn"><span>View All Products</span></a>
     </div>
   </section>
 
   <footer>
-    <div class="footer-top">
+    <div class="footer-top reveal" id="footer-reveal">
       <img src="IMG_1309.png" alt="BLACKSTAR">
       <div class="footer-links">
         <a href="#">Instagram</a>
@@ -402,6 +586,81 @@
   </footer>
 
   <script>
+    /* ── Scroll progress bar ── */
+    const scrollBar = document.getElementById('scroll-bar');
+    function updateScrollBar() {
+      const scrolled = window.scrollY;
+      const total = document.documentElement.scrollHeight - window.innerHeight;
+      scrollBar.style.width = (total > 0 ? (scrolled / total) * 100 : 0) + '%';
+    }
+
+    /* ── Nav darkens on scroll ── */
+    const nav = document.getElementById('main-nav');
+    function updateNav() {
+      nav.classList.toggle('scrolled', window.scrollY > 60);
+    }
+
+    /* ── Hero parallax ── */
+    const heroLogo = document.getElementById('hero-logo');
+    const heroIcon = document.getElementById('hero-icon');
+    function updateParallax() {
+      const y = window.scrollY;
+      if (y < window.innerHeight) {
+        heroLogo.style.transform = `translateY(${y * 0.28}px)`;
+        heroIcon.style.transform = `translateY(${y * 0.12}px)`;
+      }
+    }
+
+    /* ── Unified scroll handler ── */
+    let ticking = false;
+    function onScroll() {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          updateScrollBar();
+          updateNav();
+          updateParallax();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    updateNav();
+
+    /* ── IntersectionObserver for reveals ── */
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          el.classList.add('visible');
+          observer.unobserve(el);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+    /* ── Shop title word reveal ── */
+    const titleObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const words = entry.target.querySelectorAll('.title-word-inner');
+          words.forEach((w, i) => {
+            setTimeout(() => w.classList.add('visible'), i * 90);
+          });
+          titleObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.2 });
+
+    /* ── Card stagger reveal ── */
+    function observeCards() {
+      const cards = document.querySelectorAll('.card');
+      cards.forEach((card, i) => {
+        card.style.transitionDelay = `${i * 70}ms`;
+        observer.observe(card);
+      });
+    }
+
+    /* ── Product loader ── */
     async function loadProducts() {
       try {
         const response = await fetch('products.json');
@@ -435,13 +694,24 @@
             </div>
           </a>`;
         }).join('');
+
+        observeCards();
       } catch (error) {
         console.error('Failed to load products:', error);
         document.getElementById('products-grid').innerHTML = '<p style="grid-column: 1/-1; text-align: center; opacity: 0.5;">Error loading products</p>';
       }
     }
 
-    document.addEventListener('DOMContentLoaded', loadProducts);
+    document.addEventListener('DOMContentLoaded', () => {
+      loadProducts();
+
+      /* observe shop header elements */
+      observer.observe(document.getElementById('shop-label'));
+      observer.observe(document.getElementById('shop-all-link'));
+      observer.observe(document.getElementById('shop-cta'));
+      observer.observe(document.getElementById('footer-reveal'));
+      titleObserver.observe(document.getElementById('shop-title'));
+    });
   </script>
 
 </body>
