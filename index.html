@@ -425,6 +425,44 @@
       }
     })();
 
+    function renderApiProducts(products, grid) {
+      grid.innerHTML = products.map(product => {
+        const image = product.images && product.images[0] ? product.images[0] : null;
+        return `
+        <a href="product.html?id=${product.id}" class="card">
+          <div class="card-img">
+            ${image ? `<img src="${image}" alt="${product.name}" loading="lazy">` : ''}
+          </div>
+          <div class="card-info">
+            <span class="card-name">${product.name}</span>
+            <span class="card-price">${formatPrice(product.price, product.currency)}</span>
+          </div>
+        </a>`;
+      }).join('');
+    }
+
+    function renderJsonProducts(products, grid) {
+      grid.innerHTML = products.map(product => {
+        const image = product.image
+          ? product.image
+          : (product.images && product.images[0] ? product.images[0].src : null);
+        const price = product.price
+          ? product.price
+          : (product.variants && product.variants[0] ? product.variants[0].price : '0');
+        const url = 'https://blackstarthebrand.myshopify.com/products/' + product.handle;
+        return `
+        <a href="${url}" class="card" target="_blank">
+          <div class="card-img">
+            ${image ? `<img src="${image}" alt="${product.title}" loading="lazy">` : ''}
+          </div>
+          <div class="card-info">
+            <span class="card-name">${product.title}</span>
+            <span class="card-price">$${parseFloat(price).toFixed(2)}</span>
+          </div>
+        </a>`;
+      }).join('');
+    }
+
     async function loadProducts() {
       const grid = document.getElementById('products-grid');
       try {
@@ -432,28 +470,27 @@
         const body = await res.json();
         if (!body.ok) throw new Error(body.error);
         const products = body.data.slice(0, 6);
-
         if (products.length === 0) {
           grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;opacity:0.5;">No products available.</p>';
           return;
         }
-
-        grid.innerHTML = products.map(product => {
-          const image = product.images && product.images[0] ? product.images[0] : null;
-          return `
-          <a href="product.html?id=${product.id}" class="card">
-            <div class="card-img">
-              ${image ? `<img src="${image}" alt="${product.name}" loading="lazy">` : ''}
-            </div>
-            <div class="card-info">
-              <span class="card-name">${product.name}</span>
-              <span class="card-price">${formatPrice(product.price, product.currency)}</span>
-            </div>
-          </a>`;
-        }).join('');
+        renderApiProducts(products, grid);
       } catch (err) {
-        console.error('Failed to load products:', err);
-        grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;opacity:0.5;">Error loading products</p>';
+        // API unavailable — fall back to local products.json
+        console.warn('API unavailable, falling back to products.json:', err.message);
+        try {
+          const res  = await fetch('products.json');
+          const data = await res.json();
+          const products = (Array.isArray(data) ? data : (data.products || [])).slice(0, 6);
+          if (products.length === 0) {
+            grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;opacity:0.5;">No products available.</p>';
+            return;
+          }
+          renderJsonProducts(products, grid);
+        } catch (fallbackErr) {
+          console.error('Failed to load products:', fallbackErr);
+          grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;opacity:0.5;">Error loading products</p>';
+        }
       }
     }
 
