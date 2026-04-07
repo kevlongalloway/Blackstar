@@ -70,20 +70,24 @@
     }
     .nav-links a:hover { opacity: 1; }
 
-    /* ── Hero: sticky inside a tall wrapper ── */
+    /* ── Hero: fixed so it never moves during the animation.
+          #hero-wrap is a 190vh scroll spacer:
+            0–90vh  → animation plays (p 0→1)
+            90–190vh → hero slides up at scroll speed, next section rises from below ── */
     #hero-wrap {
       height: 190vh;
-      position: relative;
     }
     .hero {
+      position: fixed;
+      top: 0; left: 0; right: 0;
       height: 100vh;
-      position: sticky;
-      top: 0;
+      z-index: 10;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       overflow: hidden;
+      will-change: transform;
     }
 
     /* ── Logo ── */
@@ -141,14 +145,13 @@
     }
 
     /* ── Dark void curtain ── */
-    /* Fixed so it covers the viewport during the snap jump */
     #hero-curtain {
-      position: fixed;
+      position: absolute;
       inset: 0;
       background: #080808;
       opacity: 0;
       pointer-events: none;
-      z-index: 500;
+      z-index: 4;
       will-change: opacity;
     }
 
@@ -508,6 +511,7 @@
     const scrollBar  = document.getElementById('scroll-bar');
     const nav        = document.getElementById('main-nav');
     const heroWrap   = document.getElementById('hero-wrap');
+    const heroSection= document.getElementById('hero-sticky');
     const heroStar   = document.getElementById('hero-star');
     const heroFlash  = document.getElementById('hero-flash');
     const heroCurt   = document.getElementById('hero-curtain');
@@ -559,7 +563,7 @@
     /* ─────────────────────────────────────────
        MAIN SCROLL EFFECT
 
-       Timeline (p = 0 → 1):
+       Timeline (p = 0 → 1)  — hero is fixed, never moves:
          0.00 → 0.18   sub-text + hint fade out
          0.05 → 0.55   logo strips scatter + thin
          0.25 → 0.58   scattered strips fade out
@@ -567,46 +571,36 @@
          0.60 → 0.72   star rotates fast, expands
          0.70 → 0.76   white flash
          0.74 → 0.82   star collapses
-         0.80 → 1.00   dark curtain falls (fixed overlay)
+         0.80 → 1.00   dark curtain falls
 
-       After p=1 the curtain (position:fixed) covers the instant
-       scroll-jump to the next section, then fades out.
-       Scrolling back up reverses: curtain fades in, snaps back,
-       then JS resumes control at p=1.
+       Exit phase (scrollY > heroScrollRange):
+         Hero slides up at native scroll speed while the
+         next section rises naturally from below.
+         No snaps, no state machines — pure scroll math.
     ───────────────────────────────────────── */
-    let heroExited   = false;  // true once we've jumped to next section
-    let heroPaused   = false;  // true while curtain is animating (block JS updates)
-
     function updateHero() {
-      if (heroPaused) return;
-
       const sy = window.scrollY;
 
-      /* ── Already past hero: handle scroll-back-up ── */
-      if (heroExited) {
-        if (sy < heroWrap.offsetHeight - 30) {
-          // User scrolled back into the dead zone — reverse the transition
-          heroPaused = true;
-          heroCurt.style.transition = 'opacity 0.3s ease';
-          heroCurt.style.opacity    = '1';
-          setTimeout(() => {
-            window.scrollTo({ top: heroScrollRange, behavior: 'instant' });
-            heroExited = false;
-            heroCurt.style.transition = '';
-            heroCurt.style.opacity    = '1'; // p=1 keeps curtain opaque anyway
-            heroPaused = false;
-          }, 320);
-        }
+      /* ── Exit phase: hero slides upward, next section rises ── */
+      const exitPx = Math.max(0, sy - heroScrollRange);
+      heroSection.style.transform = exitPx > 0 ? `translateY(-${exitPx}px)` : '';
+
+      /* Once fully off-screen, pull it out of the stacking context */
+      if (exitPx >= window.innerHeight) {
+        heroSection.style.visibility = 'hidden';
         return;
       }
+      heroSection.style.visibility = '';
 
+      /* During exit the curtain stays fully opaque — nothing to update inside */
+      if (exitPx > 0) return;
+
+      /* ── Animation phase (p: 0 → 1) ── */
       const p = clamp(sy / heroScrollRange, 0, 1);
 
       /* — Text fade-out — */
-      if (p > 0) {
-        heroSub.style.opacity    = mr(p, 0, 0.18, 0.35, 0);
-        scrollHint.style.opacity = mr(p, 0, 0.14, 0.2, 0);
-      }
+      heroSub.style.opacity    = mr(p, 0, 0.18, 0.35, 0);
+      scrollHint.style.opacity = mr(p, 0, 0.14, 0.2, 0);
 
       /* — Clip scatter — */
       if (clipsReady) {
@@ -642,7 +636,6 @@
       }
 
       heroStar.style.opacity   = Math.max(0, starOpacity);
-      /* Include centering translation so scale/rotate always animate from center */
       heroStar.style.transform =
         `translate(-50%, -50%) scale(${Math.max(0, starScale)}) rotate(${starRot}deg)`;
 
@@ -654,25 +647,6 @@
 
       /* — Dark curtain — */
       heroCurt.style.opacity = easeIn2(mr(p, 0.82, 1.0, 0, 1));
-
-      /* — Trigger exit once curtain is fully opaque — */
-      if (p >= 0.995 && !heroExited) {
-        heroExited = true;
-        heroPaused = true;
-        heroCurt.style.opacity = '1';
-        // The curtain (position:fixed) hides the instant scroll jump
-        requestAnimationFrame(() => {
-          window.scrollTo({ top: heroWrap.offsetHeight, behavior: 'instant' });
-          requestAnimationFrame(() => {
-            heroCurt.style.transition = 'opacity 0.75s ease';
-            heroCurt.style.opacity    = '0';
-            setTimeout(() => {
-              heroCurt.style.transition = '';
-              heroPaused = false;
-            }, 800);
-          });
-        });
-      }
     }
 
     /* ─────────────────────────────────────────
