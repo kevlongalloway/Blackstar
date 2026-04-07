@@ -71,11 +71,12 @@
     .nav-links a:hover { opacity: 1; }
 
     /* ── Hero: fixed so it never moves during the animation.
-          #hero-wrap is a 190vh scroll spacer:
-            0–90vh  → animation plays (p 0→1)
-            90–190vh → hero slides up at scroll speed, next section rises from below ── */
+          #hero-wrap is a 240vh scroll spacer:
+            0–140vh  → animation plays (p 0→1)
+            70–170vh → hero slides up (exit starts at p=0.5, star bloom)
+    ── */
     #hero-wrap {
-      height: 190vh;
+      height: 240vh;
     }
     .hero {
       position: fixed;
@@ -563,40 +564,40 @@
     /* ─────────────────────────────────────────
        MAIN SCROLL EFFECT
 
-       Timeline (p = 0 → 1)  — hero is fixed, never moves:
+       Timeline (p = 0 → 1, over 140vh of scroll):
          0.00 → 0.18   sub-text + hint fade out
          0.05 → 0.55   logo strips scatter + thin
          0.25 → 0.58   scattered strips fade out
-         0.50 → 0.72   void star blooms
-         0.60 → 0.72   star rotates fast, expands
-         0.70 → 0.76   white flash
-         0.74 → 0.82   star collapses
-         0.80 → 1.00   dark curtain falls
+         0.50 → 0.76   void star blooms (slower, gentler rotation)
+         0.76 → 0.90   star collapses
+         0.78 → 0.84   white flash
+         0.86 → 1.00   dark curtain falls
 
-       Exit phase (scrollY > heroScrollRange):
+       Exit phase starts at p=0.50 (star bloom):
          Hero slides up at native scroll speed while the
-         next section rises naturally from below.
+         animation keeps playing — next section rises from below.
          No snaps, no state machines — pure scroll math.
     ───────────────────────────────────────── */
+
+    /* Hero exit begins when the star blooms (p = 0.50) */
+    const EXIT_START_P = 0.50;
+
     function updateHero() {
       const sy = window.scrollY;
+      const p  = clamp(sy / heroScrollRange, 0, 1);
 
-      /* ── Exit phase: hero slides upward, next section rises ── */
-      const exitPx = Math.max(0, sy - heroScrollRange);
+      /* ── Exit: starts at EXIT_START_P, hero slides upward ── */
+      const exitStart = heroScrollRange * EXIT_START_P;
+      const exitPx    = Math.max(0, sy - exitStart);
       heroSection.style.transform = exitPx > 0 ? `translateY(-${exitPx}px)` : '';
 
-      /* Once fully off-screen, pull it out of the stacking context */
       if (exitPx >= window.innerHeight) {
         heroSection.style.visibility = 'hidden';
         return;
       }
       heroSection.style.visibility = '';
 
-      /* During exit the curtain stays fully opaque — nothing to update inside */
-      if (exitPx > 0) return;
-
-      /* ── Animation phase (p: 0 → 1) ── */
-      const p = clamp(sy / heroScrollRange, 0, 1);
+      /* ── Animation always runs (continues through the exit phase) ── */
 
       /* — Text fade-out — */
       heroSub.style.opacity    = mr(p, 0, 0.18, 0.35, 0);
@@ -618,21 +619,21 @@
         });
       }
 
-      /* — Void star bloom — */
+      /* — Void star bloom (slower: 0.50→0.76, gentle -50° rotation) — */
       let starOpacity = 0, starScale = 0, starRot = 0;
-      if (p >= 0.50 && p < 0.74) {
-        const inP = smooth(mr(p, 0.50, 0.68, 0, 1));
+      if (p >= 0.50 && p < 0.76) {
+        const inP = smooth(mr(p, 0.50, 0.72, 0, 1));
         starOpacity = inP;
-        starScale   = inP * 1.1;
-        starRot     = mr(p, 0.50, 0.74, 0, -120);
+        starScale   = inP * 1.05;
+        starRot     = mr(p, 0.50, 0.76, 0, -50);
       }
 
-      /* — Star collapse — */
-      if (p >= 0.74 && p <= 0.84) {
-        const colP = easeIn3(mr(p, 0.74, 0.84, 0, 1));
+      /* — Star collapse (0.76→0.90, -50° to -110° total) — */
+      if (p >= 0.76 && p <= 0.90) {
+        const colP = easeIn3(mr(p, 0.76, 0.90, 0, 1));
         starOpacity = 1 - colP;
-        starScale   = 1.1 * (1 - colP);
-        starRot     = -120 - colP * 240;
+        starScale   = 1.05 * (1 - colP);
+        starRot     = -50 - colP * 60;
       }
 
       heroStar.style.opacity   = Math.max(0, starOpacity);
@@ -640,13 +641,13 @@
         `translate(-50%, -50%) scale(${Math.max(0, starScale)}) rotate(${starRot}deg)`;
 
       /* — White flash — */
-      const flashP = p >= 0.72 && p <= 0.80
-        ? Math.sin(mr(p, 0.72, 0.80, 0, Math.PI))
+      const flashP = p >= 0.78 && p <= 0.86
+        ? Math.sin(mr(p, 0.78, 0.86, 0, Math.PI))
         : 0;
       heroFlash.style.opacity = flashP * 0.85;
 
       /* — Dark curtain — */
-      heroCurt.style.opacity = easeIn2(mr(p, 0.82, 1.0, 0, 1));
+      heroCurt.style.opacity = easeIn2(mr(p, 0.86, 1.0, 0, 1));
     }
 
     /* ─────────────────────────────────────────
