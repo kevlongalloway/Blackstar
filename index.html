@@ -635,6 +635,36 @@
     }
 
     /* ─────────────────────────────────────────
+       HERO SNAP
+       After the curtain is fully opaque (p=1,
+       scrollY = heroScrollRange), there is a
+       ~100vh dead zone before the next section.
+       Snap past it immediately in both directions.
+    ───────────────────────────────────────── */
+    let prevScrollY = 0;
+    let isSnapping  = false;
+
+    function handleHeroSnap() {
+      if (isSnapping) return;
+
+      const sy         = window.scrollY;
+      const animDone   = heroScrollRange;          // p=1 point
+      const nextSection = heroWrap.offsetHeight;   // start of next section
+
+      if (sy > animDone && sy < nextSection) {
+        isSnapping = true;
+        const goingDown = sy >= prevScrollY;
+        const target    = goingDown ? nextSection : animDone;
+        window.scrollTo({ top: target, behavior: 'instant' });
+        prevScrollY = target;
+        setTimeout(() => { isSnapping = false; }, 80);
+        return;
+      }
+
+      prevScrollY = sy;
+    }
+
+    /* ─────────────────────────────────────────
        RAF LOOP
     ───────────────────────────────────────── */
     let ticking = false;
@@ -644,6 +674,7 @@
           updateScrollBar();
           updateNav();
           updateHero();
+          handleHeroSnap();
           ticking = false;
         });
         ticking = true;
