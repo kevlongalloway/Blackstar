@@ -519,6 +519,7 @@
     const heroSub    = document.getElementById('hero-sub');
     const scrollHint = document.getElementById('scroll-hint');
     const clips      = Array.from(document.querySelectorAll('.logo-clip'));
+    const firstPost  = document.querySelector('.ticker'); // first section after hero
 
     /* ─────────────────────────────────────────
        SCATTER VECTORS  (dx=vw, dy=vh, dr=deg)
@@ -551,12 +552,23 @@
     }, 1100);
 
     /* ─────────────────────────────────────────
-       HERO SCROLL RANGE
-       heroWrap = 190vh  →  scrollRange = 90vh
+       HERO SCROLL RANGE + GAP FIX
+       heroWrap = 240vh → scrollRange = 140vh
+       Exit starts at EXIT_START_P (p=0.76).
+       Without a fix, body background shows below
+       the sliding hero until the ticker scrolls
+       into view. We pull the ticker up so it
+       starts exactly at the viewport bottom when
+       the exit begins — zero visible gap.
     ───────────────────────────────────────── */
     let heroScrollRange = 1;
     const calcRange = () => {
       heroScrollRange = heroWrap.offsetHeight - window.innerHeight;
+      // Where the ticker naturally sits vs. where we want it
+      const exitStartSY   = heroScrollRange * EXIT_START_P;
+      const desiredStart  = exitStartSY + window.innerHeight; // viewport bottom at exit start
+      const naturalStart  = heroWrap.offsetHeight;            // where ticker currently is
+      firstPost.style.marginTop = (desiredStart - naturalStart) + 'px'; // negative = pull up
     };
     calcRange();
     window.addEventListener('resize', calcRange);
@@ -579,8 +591,8 @@
          No snaps, no state machines — pure scroll math.
     ───────────────────────────────────────── */
 
-    /* Hero exit begins when the star blooms (p = 0.50) */
-    const EXIT_START_P = 0.50;
+    /* Hero exit begins when the star starts collapsing (p = 0.76) */
+    const EXIT_START_P = 0.76;
 
     function updateHero() {
       const sy = window.scrollY;
