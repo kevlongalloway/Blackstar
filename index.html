@@ -115,12 +115,14 @@
     /* ── Central void star ── */
     #hero-star {
       position: absolute;
+      top: 50%;
+      left: 50%;
       font-family: 'Bebas Neue', sans-serif;
       font-size: 60vw;
       line-height: 1;
       color: #f0ede8;
       opacity: 0;
-      transform: scale(0);
+      transform: translate(-50%, -50%) scale(0);
       pointer-events: none;
       z-index: 2;
       will-change: transform, opacity;
@@ -139,13 +141,14 @@
     }
 
     /* ── Dark void curtain ── */
+    /* Fixed so it covers the viewport during the snap jump */
     #hero-curtain {
-      position: absolute;
+      position: fixed;
       inset: 0;
       background: #080808;
       opacity: 0;
       pointer-events: none;
-      z-index: 4;
+      z-index: 500;
       will-change: opacity;
     }
 
@@ -564,28 +567,57 @@
          0.60 → 0.72   star rotates fast, expands
          0.70 → 0.76   white flash
          0.74 → 0.82   star collapses
-         0.80 → 1.00   dark curtain falls
+         0.80 → 1.00   dark curtain falls (fixed overlay)
+
+       After p=1 the curtain (position:fixed) covers the instant
+       scroll-jump to the next section, then fades out.
+       Scrolling back up reverses: curtain fades in, snaps back,
+       then JS resumes control at p=1.
     ───────────────────────────────────────── */
+    let heroExited   = false;  // true once we've jumped to next section
+    let heroPaused   = false;  // true while curtain is animating (block JS updates)
+
     function updateHero() {
-      const p = clamp(window.scrollY / heroScrollRange, 0, 1);
+      if (heroPaused) return;
+
+      const sy = window.scrollY;
+
+      /* ── Already past hero: handle scroll-back-up ── */
+      if (heroExited) {
+        if (sy < heroWrap.offsetHeight - 30) {
+          // User scrolled back into the dead zone — reverse the transition
+          heroPaused = true;
+          heroCurt.style.transition = 'opacity 0.3s ease';
+          heroCurt.style.opacity    = '1';
+          setTimeout(() => {
+            window.scrollTo({ top: heroScrollRange, behavior: 'instant' });
+            heroExited = false;
+            heroCurt.style.transition = '';
+            heroCurt.style.opacity    = '1'; // p=1 keeps curtain opaque anyway
+            heroPaused = false;
+          }, 320);
+        }
+        return;
+      }
+
+      const p = clamp(sy / heroScrollRange, 0, 1);
 
       /* — Text fade-out — */
       if (p > 0) {
-        heroSub.style.opacity  = mr(p, 0, 0.18, 0.35, 0);
+        heroSub.style.opacity    = mr(p, 0, 0.18, 0.35, 0);
         scrollHint.style.opacity = mr(p, 0, 0.14, 0.2, 0);
       }
 
       /* — Clip scatter — */
       if (clipsReady) {
-        const sp = easeIn2(mr(p, 0.05, 0.55, 0, 1));   // scatter progress
-        const fp = mr(p, 0.25, 0.58, 1, 0);             // fade progress
-
+        const sp = easeIn2(mr(p, 0.05, 0.55, 0, 1));
+        const fp = mr(p, 0.25, 0.58, 1, 0);
         clips.forEach((clip, i) => {
-          const v  = VECTORS[i];
-          const tx = sp * v.dx;
-          const ty = sp * v.dy;
+          const v   = VECTORS[i];
+          const tx  = sp * v.dx;
+          const ty  = sp * v.dy;
           const rot = REST_ROTS[i] + sp * v.dr;
-          const sx = 1 - sp * 0.75;  // strips thin out as they scatter
+          const sx  = 1 - sp * 0.75;
           clip.style.transform =
             `translate(${tx}vw, ${ty}vh) rotate(${rot}deg) scaleX(${Math.max(sx, 0.05)})`;
           clip.style.opacity = fp;
@@ -606,13 +638,15 @@
         const colP = easeIn3(mr(p, 0.74, 0.84, 0, 1));
         starOpacity = 1 - colP;
         starScale   = 1.1 * (1 - colP);
-        starRot     = -120 - colP * 240;  // spins faster as it implodes
+        starRot     = -120 - colP * 240;
       }
 
-      heroStar.style.opacity = Math.max(0, starOpacity);
-      heroStar.style.transform = `scale(${Math.max(0, starScale)}) rotate(${starRot}deg)`;
+      heroStar.style.opacity   = Math.max(0, starOpacity);
+      /* Include centering translation so scale/rotate always animate from center */
+      heroStar.style.transform =
+        `translate(-50%, -50%) scale(${Math.max(0, starScale)}) rotate(${starRot}deg)`;
 
-      /* — White flash at collapse peak — */
+      /* — White flash — */
       const flashP = p >= 0.72 && p <= 0.80
         ? Math.sin(mr(p, 0.72, 0.80, 0, Math.PI))
         : 0;
@@ -620,6 +654,25 @@
 
       /* — Dark curtain — */
       heroCurt.style.opacity = easeIn2(mr(p, 0.82, 1.0, 0, 1));
+
+      /* — Trigger exit once curtain is fully opaque — */
+      if (p >= 0.995 && !heroExited) {
+        heroExited = true;
+        heroPaused = true;
+        heroCurt.style.opacity = '1';
+        // The curtain (position:fixed) hides the instant scroll jump
+        requestAnimationFrame(() => {
+          window.scrollTo({ top: heroWrap.offsetHeight, behavior: 'instant' });
+          requestAnimationFrame(() => {
+            heroCurt.style.transition = 'opacity 0.75s ease';
+            heroCurt.style.opacity    = '0';
+            setTimeout(() => {
+              heroCurt.style.transition = '';
+              heroPaused = false;
+            }, 800);
+          });
+        });
+      }
     }
 
     /* ─────────────────────────────────────────
@@ -635,36 +688,6 @@
     }
 
     /* ─────────────────────────────────────────
-       HERO SNAP
-       After the curtain is fully opaque (p=1,
-       scrollY = heroScrollRange), there is a
-       ~100vh dead zone before the next section.
-       Snap past it immediately in both directions.
-    ───────────────────────────────────────── */
-    let prevScrollY = 0;
-    let isSnapping  = false;
-
-    function handleHeroSnap() {
-      if (isSnapping) return;
-
-      const sy         = window.scrollY;
-      const animDone   = heroScrollRange;          // p=1 point
-      const nextSection = heroWrap.offsetHeight;   // start of next section
-
-      if (sy > animDone && sy < nextSection) {
-        isSnapping = true;
-        const goingDown = sy >= prevScrollY;
-        const target    = goingDown ? nextSection : animDone;
-        window.scrollTo({ top: target, behavior: 'instant' });
-        prevScrollY = target;
-        setTimeout(() => { isSnapping = false; }, 80);
-        return;
-      }
-
-      prevScrollY = sy;
-    }
-
-    /* ─────────────────────────────────────────
        RAF LOOP
     ───────────────────────────────────────── */
     let ticking = false;
@@ -674,7 +697,6 @@
           updateScrollBar();
           updateNav();
           updateHero();
-          handleHeroSnap();
           ticking = false;
         });
         ticking = true;
