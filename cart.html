@@ -460,7 +460,7 @@
       try {
         // Create a payment intent to get the publishable key
         const items = cart.map(i => ({ productId: i.productId, quantity: i.quantity }));
-        const res   = await fetch(API_BASE + '/checkout/intent', {
+        const res   = await fetch('https://ecommaxxing.kevlongalloway1999m.workers.dev/checkout/intent', {
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },
           body:    JSON.stringify({ items }),
@@ -547,7 +547,7 @@
       const items = cart.map(i => ({ productId: i.productId, quantity: i.quantity }));
 
       try {
-        const res  = await fetch(API_BASE + '/checkout/session', {
+        const res  = await fetch('https://ecommaxxing.kevlongalloway1999m.workers.dev/checkout/session', {
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },
           body:    JSON.stringify({
