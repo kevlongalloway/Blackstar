@@ -3,4 +3,7 @@ services:
     name: blackstar-site
     plan: free
     staticSite: true
-    buildCommand: echo "Static site - no build needed"
+    buildCommand: echo "window.BST_API_BASE=\"${API_BASE_URL}\";" > config.js
+    envVars:
+      - key: API_BASE_URL
+        sync: false

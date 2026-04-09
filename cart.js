@@ -1,8 +1,9 @@
 'use strict';
 
 // ─── API ─────────────────────────────────────────────────────────────────────
-// TODO: Replace with your Cloudflare Worker URL when ready
-const API_BASE = 'https://YOUR_WORKER.workers.dev';
+// Set via window.BST_API_BASE (injected by config.js, generated at build time).
+// On Render, configure the API_BASE_URL environment variable in the dashboard.
+const API_BASE = (window.BST_API_BASE || '').replace(/\/$/, '');
 
 // ─── CART STORAGE ─────────────────────────────────────────────────────────────
 const CART_KEY = 'bst_cart';

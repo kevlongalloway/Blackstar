@@ -270,59 +270,21 @@
     <p class="footer-copy">© 2026 BLACKSTAR</p>
   </footer>
 
+  <script src="config.js"></script>
   <script src="cart.js"></script>
   <script>
-    function renderApiProducts(products, grid, countEl) {
-      countEl.textContent = products.length + ' item' + (products.length !== 1 ? 's' : '');
-      grid.innerHTML = products.map(product => {
-        const image = product.images && product.images[0] ? product.images[0] : null;
-        return `
-        <a href="product.html?id=${product.id}" class="card">
-          <div class="card-img">
-            ${image ? `<img src="${image}" alt="${product.name}" loading="lazy">` : ''}
-          </div>
-          <div class="card-info">
-            <span class="card-name">${product.name}</span>
-            <span class="card-price">${formatPrice(product.price, product.currency)}</span>
-          </div>
-        </a>`;
-      }).join('');
-    }
-
-    function renderJsonProducts(products, grid, countEl) {
-      countEl.textContent = products.length + ' item' + (products.length !== 1 ? 's' : '');
-      grid.innerHTML = products.map(product => {
-        const image = product.image
-          ? product.image
-          : (product.images && product.images[0] ? product.images[0].src : null);
-        const price = product.price
-          ? product.price
-          : (product.variants && product.variants[0] ? product.variants[0].price : '0');
-        const url = 'https://blackstarthebrand.myshopify.com/products/' + product.handle;
-        return `
-        <a href="${url}" class="card" target="_blank">
-          <div class="card-img">
-            ${image ? `<img src="${image}" alt="${product.title}" loading="lazy">` : ''}
-          </div>
-          <div class="card-info">
-            <span class="card-name">${product.title}</span>
-            <span class="card-price">$${parseFloat(price).toFixed(2)}</span>
-          </div>
-        </a>`;
-      }).join('');
-    }
-
     async function loadProducts() {
       const grid    = document.getElementById('products-grid');
       const countEl = document.getElementById('product-count');
 
       try {
-        // Fetch all products from API (paginate if needed)
+        // Paginate through all products
         let all = [], offset = 0, limit = 100;
         while (true) {
           const res  = await fetch(API_BASE + '/products?limit=' + limit + '&offset=' + offset);
           const body = await res.json();
-          if (!body.ok || !body.data.length) break;
+          if (!body.ok) throw new Error(body.error);
+          if (!body.data.length) break;
           all    = all.concat(body.data);
           offset += body.data.length;
           if (body.data.length < limit) break;
@@ -331,23 +293,23 @@
           grid.innerHTML = '<p class="state-msg">No products available.</p>';
           return;
         }
-        renderApiProducts(all, grid, countEl);
+        countEl.textContent = all.length + ' item' + (all.length !== 1 ? 's' : '');
+        grid.innerHTML = all.map(product => {
+          const image = product.images && product.images[0] ? product.images[0] : null;
+          return `
+          <a href="product.html?id=${product.id}" class="card">
+            <div class="card-img">
+              ${image ? `<img src="${image}" alt="${product.name}" loading="lazy">` : ''}
+            </div>
+            <div class="card-info">
+              <span class="card-name">${product.name}</span>
+              <span class="card-price">${formatPrice(product.price, product.currency)}</span>
+            </div>
+          </a>`;
+        }).join('');
       } catch (err) {
-        // API unavailable — fall back to local products.json
-        console.warn('API unavailable, falling back to products.json:', err.message);
-        try {
-          const res  = await fetch('products.json');
-          const data = await res.json();
-          const products = Array.isArray(data) ? data : (data.products || []);
-          if (products.length === 0) {
-            grid.innerHTML = '<p class="state-msg">No products available.</p>';
-            return;
-          }
-          renderJsonProducts(products, grid, countEl);
-        } catch (fallbackErr) {
-          console.error('Failed to load products:', fallbackErr);
-          grid.innerHTML = '<p class="state-msg">Error loading products.</p>';
-        }
+        console.error('Failed to load products:', err.message);
+        grid.innerHTML = '<p class="state-msg">Error loading products.</p>';
       }
     }
 
