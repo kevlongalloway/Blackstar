@@ -134,6 +134,22 @@
       text-transform: uppercase;
     }
 
+    /* Hero video */
+    .hero-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+    }
+
+    .hero-video.visible {
+      opacity: 1;
+    }
+
     /* Ticker */
     .ticker {
       overflow: hidden;
@@ -342,6 +358,7 @@
   </nav>
 
   <section class="hero">
+    <video id="heroVideo" class="hero-video" src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/Blackstar%20Fear%20Nobody%20-%20Drive%20In%20Final.mp4" muted playsinline preload="auto"></video>
     <div class="hero-logo" aria-label="BLACKSTAR">
       <img class="logo-sizer" src="IMG_1309.png" alt="BLACKSTAR">
       <img class="logo-clip" src="IMG_1309.png" alt="" style="--cl:0%;     --cr:88.89%; --rot:-1.8deg; --d:0.00s">
@@ -457,6 +474,32 @@
     }
 
     document.addEventListener('DOMContentLoaded', loadProducts);
+  </script>
+
+  <script>
+    (function () {
+      var vid = document.getElementById('heroVideo');
+      var restartTimer = null;
+
+      function fadeOut() {
+        vid.classList.remove('visible');
+        restartTimer = setTimeout(function () {
+          vid.currentTime = 0;
+          vid.play().catch(function(){});
+        }, 5000);
+      }
+
+      vid.addEventListener('ended', fadeOut);
+
+      vid.addEventListener('playing', function () {
+        clearTimeout(restartTimer);
+        vid.classList.add('visible');
+      });
+
+      setTimeout(function () {
+        vid.play().catch(function(){});
+      }, 2000);
+    })();
   </script>
 
 </body>
