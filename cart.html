@@ -366,27 +366,30 @@
 
       body.innerHTML = `
         <div class="cart-items">
-          ${cart.map(item => `
-            <div class="cart-item" data-id="${item.productId}">
+          ${cart.map(item => {
+          const lId = item.lineId || item.productId;
+          return `
+            <div class="cart-item" data-id="${lId}">
               <div class="cart-item-img">
                 ${item.image
                   ? `<img src="${item.image}" alt="${item.name}" loading="lazy">`
                   : ''}
               </div>
               <div>
-                <p class="cart-item-name">${item.name}</p>
+                <p class="cart-item-name">${item.name}${item.size ? ' — ' + item.size : ''}</p>
                 <p class="cart-item-price">${formatPrice(item.price, item.currency)}</p>
                 <div class="qty-row">
-                  <button class="qty-btn" data-action="minus" data-id="${item.productId}">−</button>
+                  <button class="qty-btn" data-action="minus" data-id="${lId}">−</button>
                   <span class="qty-display">${item.quantity}</span>
-                  <button class="qty-btn" data-action="plus" data-id="${item.productId}">+</button>
+                  <button class="qty-btn" data-action="plus" data-id="${lId}">+</button>
                 </div>
               </div>
               <div>
                 <p class="cart-item-subtotal">${formatPrice(item.price * item.quantity, item.currency)}</p>
-                <button class="cart-item-remove" data-id="${item.productId}">Remove</button>
+                <button class="cart-item-remove" data-id="${lId}">Remove</button>
               </div>
-            </div>`).join('')}
+            </div>`;
+        }).join('')}
         </div>
 
         <div class="cart-summary">
@@ -421,7 +424,7 @@
       body.querySelectorAll('.qty-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           const id   = btn.dataset.id;
-          const item = getCart().find(i => i.productId === id);
+          const item = getCart().find(i => (i.lineId || i.productId) === id);
           if (!item) return;
           if (btn.dataset.action === 'minus') setQuantity(id, item.quantity - 1);
           else setQuantity(id, item.quantity + 1);
@@ -544,7 +547,11 @@
       hideCheckoutError();
 
       const cart  = getCart();
-      const items = cart.map(i => ({ productId: i.productId, quantity: i.quantity }));
+      const items = cart.map(i => ({
+        productId: i.productId,
+        quantity:  i.quantity,
+        name:      i.name + (i.size ? ' — ' + i.size : ''),
+      }));
 
       try {
         const res  = await fetch('https://ecommaxxing.kevlongalloway1999m.workers.dev/checkout/session', {

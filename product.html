@@ -217,6 +217,46 @@
     }
     .btn-buy:hover { opacity: 0.6; }
 
+    /* Size selector */
+    .size-row { margin-bottom: 20px; }
+    .size-label {
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      opacity: 0.35;
+      margin-bottom: 10px;
+    }
+    .size-options { display: flex; flex-wrap: wrap; gap: 8px; }
+    .size-btn {
+      background: none;
+      border: 1px solid rgba(240,237,232,0.2);
+      color: #f0ede8;
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      min-width: 44px;
+      height: 44px;
+      padding: 0 10px;
+      cursor: crosshair;
+      opacity: 0.6;
+      text-transform: uppercase;
+      transition: opacity 0.2s, border-color 0.2s, background 0.2s, color 0.2s;
+    }
+    .size-btn:hover { opacity: 1; border-color: rgba(240,237,232,0.5); }
+    .size-btn.selected {
+      background: #f0ede8;
+      color: #080808;
+      border-color: #f0ede8;
+      opacity: 1;
+    }
+    .size-error {
+      font-size: 9px;
+      letter-spacing: 0.15em;
+      color: #e84040;
+      margin-bottom: 12px;
+      display: none;
+    }
+
     /* Toast */
     .toast {
       position: fixed;
@@ -333,6 +373,8 @@
       const stock  = stockLabel(product);
       const image  = product.images && product.images[0] ? product.images[0] : null;
       const avail  = product.active && (product.stock === -1 || product.stock > 0);
+      const sizes  = product.metadata && Array.isArray(product.metadata.sizes) && product.metadata.sizes.length > 0
+                       ? product.metadata.sizes : null;
 
       page.innerHTML = `
         <div class="product-layout">
@@ -347,6 +389,15 @@
             <p class="product-price">${formatPrice(product.price, product.currency)}</p>
             <p class="product-stock ${stock.cls}">${stock.text}</p>
             ${product.description ? `<p class="product-desc">${product.description}</p>` : ''}
+            ${sizes ? `
+            <div class="size-row">
+              <p class="size-label">Size</p>
+              <div class="size-options">
+                ${sizes.map(s => `<button class="size-btn" data-size="${s}">${s}</button>`).join('')}
+              </div>
+            </div>
+            <p class="size-error" id="size-error">Please select a size</p>
+            ` : ''}
             <div class="qty-row">
               <button class="qty-btn" id="qty-minus" aria-label="Decrease">−</button>
               <input class="qty-val" id="qty-val" type="number" value="1" min="1" max="${product.stock === -1 ? 99 : product.stock || 1}">
@@ -362,6 +413,7 @@
       // Quantity controls
       const qtyInput = document.getElementById('qty-val');
       const maxQty   = product.stock === -1 ? 99 : (product.stock || 1);
+      let selectedSize = null;
 
       document.getElementById('qty-minus').addEventListener('click', () => {
         qtyInput.value = Math.max(1, parseInt(qtyInput.value, 10) - 1);
@@ -370,10 +422,28 @@
         qtyInput.value = Math.min(maxQty, parseInt(qtyInput.value, 10) + 1);
       });
 
+      // Size selection
+      if (sizes) {
+        page.querySelectorAll('.size-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            page.querySelectorAll('.size-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedSize = btn.dataset.size;
+            const errEl = document.getElementById('size-error');
+            if (errEl) errEl.style.display = 'none';
+          });
+        });
+      }
+
       // Add to cart
       document.getElementById('btn-add').addEventListener('click', () => {
+        if (sizes && !selectedSize) {
+          const errEl = document.getElementById('size-error');
+          if (errEl) errEl.style.display = 'block';
+          return;
+        }
         const qty = parseInt(qtyInput.value, 10) || 1;
-        addToCart(product, qty);
+        addToCart(product, qty, selectedSize);
         showToast('Added to cart');
       });
     }

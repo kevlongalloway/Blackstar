@@ -18,34 +18,37 @@ function _saveCart(cart) {
   window.dispatchEvent(new CustomEvent('bst:cart-updated'));
 }
 
-function addToCart(product, quantity) {
+function addToCart(product, quantity, size) {
   const qty  = Math.max(1, parseInt(quantity, 10) || 1);
   const cart = getCart();
-  const idx  = cart.findIndex(i => i.productId === product.id);
+  const lId  = size ? product.id + ':' + size : product.id;
+  const idx  = cart.findIndex(i => (i.lineId || i.productId) === lId);
   if (idx >= 0) {
     cart[idx].quantity += qty;
   } else {
     cart.push({
+      lineId:    lId,
       productId: product.id,
       name:      product.name,
       price:     product.price,
       currency:  product.currency,
       image:     (product.images && product.images[0]) ? product.images[0] : '',
       quantity:  qty,
+      size:      size || null,
     });
   }
   _saveCart(cart);
 }
 
-function removeFromCart(productId) {
-  _saveCart(getCart().filter(i => i.productId !== productId));
+function removeFromCart(lineId) {
+  _saveCart(getCart().filter(i => (i.lineId || i.productId) !== lineId));
 }
 
-function setQuantity(productId, quantity) {
+function setQuantity(lineId, quantity) {
   const qty = Math.max(0, parseInt(quantity, 10) || 0);
-  if (qty === 0) { removeFromCart(productId); return; }
+  if (qty === 0) { removeFromCart(lineId); return; }
   const cart = getCart();
-  const idx  = cart.findIndex(i => i.productId === productId);
+  const idx  = cart.findIndex(i => (i.lineId || i.productId) === lineId);
   if (idx >= 0) { cart[idx].quantity = qty; _saveCart(cart); }
 }
 
