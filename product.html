@@ -373,8 +373,14 @@
       const stock  = stockLabel(product);
       const image  = product.images && product.images[0] ? product.images[0] : null;
       const avail  = product.active && (product.stock === -1 || product.stock > 0);
-      const sizes  = product.metadata && Array.isArray(product.metadata.sizes) && product.metadata.sizes.length > 0
-                       ? product.metadata.sizes : null;
+      // Support metadata.variants [{size,stock},...] (from admin UI)
+      // and metadata.sizes ["S","M",...] (flat array) as fallback
+      const _variants = product.metadata && Array.isArray(product.metadata.variants) && product.metadata.variants.length > 0
+                          ? product.metadata.variants.map(v => v.size).filter(Boolean) : null;
+      const sizes = _variants && _variants.length > 0
+                      ? _variants
+                      : (product.metadata && Array.isArray(product.metadata.sizes) && product.metadata.sizes.length > 0
+                          ? product.metadata.sizes : null);
 
       page.innerHTML = `
         <div class="product-layout">
