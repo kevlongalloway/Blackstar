@@ -311,6 +311,18 @@
     }
     .footer-links a:hover { opacity: 1; }
     .footer-copy { font-size: 9px; opacity: 0.3; letter-spacing: 0.1em; }
+
+    .footer-bottom {
+      background: #080808;
+      color: #f0ede8;
+      text-align: center;
+      padding: 12px 16px;
+      font-size: 9px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+    .footer-bottom a { color: inherit; text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -344,6 +356,11 @@
     <p class="footer-copy">© 2026 BLACKSTAR</p>
   </footer>
 
+  <div class="footer-bottom">
+    © 2026, BlackStar the Brand Powered by <a href="https://upcart.online" target="_blank" rel="noopener">upcart.online</a>
+  </div>
+
+  <script src="config.js"></script>
   <script src="cart.js"></script>
   <script>
     // ─── RENDER CART ──────────────────────────────────────────────────────────
@@ -365,27 +382,30 @@
 
       body.innerHTML = `
         <div class="cart-items">
-          ${cart.map(item => `
-            <div class="cart-item" data-id="${item.productId}">
+          ${cart.map(item => {
+          const lId = item.lineId || item.productId;
+          return `
+            <div class="cart-item" data-id="${lId}">
               <div class="cart-item-img">
                 ${item.image
                   ? `<img src="${item.image}" alt="${item.name}" loading="lazy">`
                   : ''}
               </div>
               <div>
-                <p class="cart-item-name">${item.name}</p>
+                <p class="cart-item-name">${item.name}${item.size ? ' — ' + item.size : ''}</p>
                 <p class="cart-item-price">${formatPrice(item.price, item.currency)}</p>
                 <div class="qty-row">
-                  <button class="qty-btn" data-action="minus" data-id="${item.productId}">−</button>
+                  <button class="qty-btn" data-action="minus" data-id="${lId}">−</button>
                   <span class="qty-display">${item.quantity}</span>
-                  <button class="qty-btn" data-action="plus" data-id="${item.productId}">+</button>
+                  <button class="qty-btn" data-action="plus" data-id="${lId}">+</button>
                 </div>
               </div>
               <div>
                 <p class="cart-item-subtotal">${formatPrice(item.price * item.quantity, item.currency)}</p>
-                <button class="cart-item-remove" data-id="${item.productId}">Remove</button>
+                <button class="cart-item-remove" data-id="${lId}">Remove</button>
               </div>
-            </div>`).join('')}
+            </div>`;
+        }).join('')}
         </div>
 
         <div class="cart-summary">
@@ -420,7 +440,7 @@
       body.querySelectorAll('.qty-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           const id   = btn.dataset.id;
-          const item = getCart().find(i => i.productId === id);
+          const item = getCart().find(i => (i.lineId || i.productId) === id);
           if (!item) return;
           if (btn.dataset.action === 'minus') setQuantity(id, item.quantity - 1);
           else setQuantity(id, item.quantity + 1);
@@ -459,7 +479,7 @@
       try {
         // Create a payment intent to get the publishable key
         const items = cart.map(i => ({ productId: i.productId, quantity: i.quantity }));
-        const res   = await fetch(API_BASE + '/checkout/intent', {
+        const res   = await fetch('https://ecommaxxing.kevlongalloway1999m.workers.dev/checkout/intent', {
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },
           body:    JSON.stringify({ items }),
@@ -543,10 +563,14 @@
       hideCheckoutError();
 
       const cart  = getCart();
-      const items = cart.map(i => ({ productId: i.productId, quantity: i.quantity }));
+      const items = cart.map(i => ({
+        productId: i.productId,
+        quantity:  i.quantity,
+        name:      i.name + (i.size ? ' — ' + i.size : ''),
+      }));
 
       try {
-        const res  = await fetch(API_BASE + '/checkout/session', {
+        const res  = await fetch('https://ecommaxxing.kevlongalloway1999m.workers.dev/checkout/session', {
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },
           body:    JSON.stringify({

@@ -3,4 +3,7 @@ services:
     name: blackstar-site
     plan: free
     staticSite: true
-    buildCommand: echo "Static site - no build needed"
+    buildCommand: sh build.sh
+    envVars:
+      - key: API_BASE_URL
+        sync: false

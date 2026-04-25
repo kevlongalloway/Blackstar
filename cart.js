@@ -1,8 +1,9 @@
 'use strict';
 
 // ─── API ─────────────────────────────────────────────────────────────────────
-// TODO: Replace with your Cloudflare Worker URL when ready
-const API_BASE = 'https://YOUR_WORKER.workers.dev';
+// Set via window.BST_API_BASE (injected by config.js, generated at build time).
+// On Render, configure the API_BASE_URL environment variable in the dashboard.
+const API_BASE = 'https://ecommaxxing.kevlongalloway1999m.workers.dev'
 
 // ─── CART STORAGE ─────────────────────────────────────────────────────────────
 const CART_KEY = 'bst_cart';
@@ -17,34 +18,37 @@ function _saveCart(cart) {
   window.dispatchEvent(new CustomEvent('bst:cart-updated'));
 }
 
-function addToCart(product, quantity) {
+function addToCart(product, quantity, size) {
   const qty  = Math.max(1, parseInt(quantity, 10) || 1);
   const cart = getCart();
-  const idx  = cart.findIndex(i => i.productId === product.id);
+  const lId  = size ? product.id + ':' + size : product.id;
+  const idx  = cart.findIndex(i => (i.lineId || i.productId) === lId);
   if (idx >= 0) {
     cart[idx].quantity += qty;
   } else {
     cart.push({
+      lineId:    lId,
       productId: product.id,
       name:      product.name,
       price:     product.price,
       currency:  product.currency,
       image:     (product.images && product.images[0]) ? product.images[0] : '',
       quantity:  qty,
+      size:      size || null,
     });
   }
   _saveCart(cart);
 }
 
-function removeFromCart(productId) {
-  _saveCart(getCart().filter(i => i.productId !== productId));
+function removeFromCart(lineId) {
+  _saveCart(getCart().filter(i => (i.lineId || i.productId) !== lineId));
 }
 
-function setQuantity(productId, quantity) {
+function setQuantity(lineId, quantity) {
   const qty = Math.max(0, parseInt(quantity, 10) || 0);
-  if (qty === 0) { removeFromCart(productId); return; }
+  if (qty === 0) { removeFromCart(lineId); return; }
   const cart = getCart();
-  const idx  = cart.findIndex(i => i.productId === productId);
+  const idx  = cart.findIndex(i => (i.lineId || i.productId) === lineId);
   if (idx >= 0) { cart[idx].quantity = qty; _saveCart(cart); }
 }
 
