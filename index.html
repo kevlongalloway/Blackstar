@@ -501,6 +501,10 @@
       var vid = document.getElementById('heroVideo');
       var restartTimer = null;
 
+      // Belt-and-suspenders: some browsers only respect the muted *property* for autoplay
+      vid.muted = true;
+      vid.defaultMuted = true;
+
       function tryPlay() {
         var p = vid.play();
         if (p && typeof p.catch === 'function') {
@@ -527,10 +531,20 @@
         console.error('hero video failed to load:', vid.error && vid.error.message);
       });
 
-      // Fallback in case the browser blocks the initial autoplay
-      function userKick() { tryPlay(); }
-      document.addEventListener('click', userKick, { once: true });
-      document.addEventListener('touchstart', userKick, { once: true, passive: true });
+      // Kick off ASAP; if it's already playing from the autoplay attribute, mark visible
+      tryPlay();
+      if (!vid.paused) vid.classList.add('visible');
+
+      // Broad fallback for browsers that block autoplay until any user gesture
+      var kicked = false;
+      function userKick() {
+        if (kicked) return;
+        kicked = true;
+        tryPlay();
+      }
+      ['pointerdown', 'click', 'touchstart', 'wheel', 'scroll', 'keydown'].forEach(function (ev) {
+        window.addEventListener(ev, userKick, { once: true, passive: true, capture: true });
+      });
     })();
   </script>
 
