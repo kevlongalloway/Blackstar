@@ -374,7 +374,7 @@
   </nav>
 
   <section class="hero">
-    <video id="heroVideo" class="hero-video" muted playsinline preload="auto"></video>
+    <video id="heroVideo" class="hero-video" src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/Blackstar%20Fear%20Nobody%20-%20Drive%20In%20Final.mp4" muted playsinline autoplay preload="auto"></video>
     <div class="hero-logo" aria-label="BLACKSTAR">
       <img class="logo-sizer" src="IMG_1309.png" alt="BLACKSTAR">
       <img class="logo-clip" src="IMG_1309.png" alt="" style="--cl:0%;     --cr:88.89%; --rot:-1.8deg; --d:0.00s">
@@ -498,11 +498,10 @@
 
   <script>
     (function () {
-      var SRC = 'https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/Blackstar%20Fear%20Nobody%20-%20Drive%20In%20Final.mp4';
       var vid = document.getElementById('heroVideo');
       var restartTimer = null;
 
-      function doPlay() {
+      function tryPlay() {
         var p = vid.play();
         if (p && typeof p.catch === 'function') {
           p.catch(function (err) { console.warn('hero video play rejected:', err); });
@@ -513,7 +512,7 @@
         vid.classList.remove('visible');
         restartTimer = setTimeout(function () {
           vid.currentTime = 0;
-          doPlay();
+          tryPlay();
         }, 5000);
       }
 
@@ -524,16 +523,14 @@
         vid.classList.add('visible');
       });
 
-      vid.addEventListener('canplay', doPlay, { once: true });
-
       vid.addEventListener('error', function () {
         console.error('hero video failed to load:', vid.error && vid.error.message);
       });
 
-      setTimeout(function () {
-        vid.src = SRC;
-        vid.load();
-      }, 2000);
+      // Fallback in case the browser blocks the initial autoplay
+      function userKick() { tryPlay(); }
+      document.addEventListener('click', userKick, { once: true });
+      document.addEventListener('touchstart', userKick, { once: true, passive: true });
     })();
   </script>
 
