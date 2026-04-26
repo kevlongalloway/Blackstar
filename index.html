@@ -545,6 +545,8 @@
       ['pointerdown', 'click', 'touchstart', 'wheel', 'scroll', 'keydown'].forEach(function (ev) {
         window.addEventListener(ev, userKick, { once: true, passive: true, capture: true });
       });
+
+      setTimeout(userKick, 1500);
     })();
   </script>
 
