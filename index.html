@@ -134,7 +134,7 @@
       text-transform: uppercase;
     }
 
-    /* Hero video */
+    /* Hero animated WebP */
     .hero-video {
       position: absolute;
       inset: 0;
@@ -374,7 +374,7 @@
   </nav>
 
   <section class="hero">
-    <video id="heroVideo" class="hero-video" src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/Blackstar%20Fear%20Nobody%20-%20Drive%20In%20Final.mp4" muted playsinline autoplay preload="auto"></video>
+    <img id="heroVideo" class="hero-video" src="hero.webp" alt="" decoding="async" fetchpriority="high">
     <div class="hero-logo" aria-label="BLACKSTAR">
       <img class="logo-sizer" src="IMG_1309.png" alt="BLACKSTAR">
       <img class="logo-clip" src="IMG_1309.png" alt="" style="--cl:0%;     --cr:88.89%; --rot:-1.8deg; --d:0.00s">
@@ -498,72 +498,12 @@
 
   <script>
     (function () {
-      var vid = document.getElementById('heroVideo');
-      var restartTimer = null;
-      var retryInterval = null;
-      var retryDeadline = 0;
-
-      // Belt-and-suspenders: some browsers only respect the muted *property* for autoplay
-      vid.muted = true;
-      vid.defaultMuted = true;
-      vid.setAttribute('muted', '');
-      vid.setAttribute('playsinline', '');
-
-      function tryPlay() {
-        if (!vid.paused) return;
-        var p = vid.play();
-        if (p && typeof p.catch === 'function') {
-          p.catch(function (err) { console.warn('hero video play rejected:', err); });
-        }
-      }
-
-      function startRetry() {
-        if (retryInterval) return;
-        retryDeadline = Date.now() + 8000;
-        retryInterval = setInterval(function () {
-          if (!vid.paused || Date.now() > retryDeadline) {
-            clearInterval(retryInterval);
-            retryInterval = null;
-            return;
-          }
-          tryPlay();
-        }, 400);
-      }
-
-      function fadeOut() {
-        vid.classList.remove('visible');
-        restartTimer = setTimeout(function () {
-          vid.currentTime = 0;
-          tryPlay();
-        }, 5000);
-      }
-
-      vid.addEventListener('ended', fadeOut);
-
-      vid.addEventListener('playing', function () {
-        clearTimeout(restartTimer);
-        if (retryInterval) { clearInterval(retryInterval); retryInterval = null; }
-        vid.classList.add('visible');
-      });
-
-      vid.addEventListener('error', function () {
-        console.error('hero video failed to load:', vid.error && vid.error.message);
-      });
-
-      // Hit play on every readiness milestone — whichever fires first wins
-      ['loadedmetadata', 'loadeddata', 'canplay', 'canplaythrough'].forEach(function (ev) {
-        vid.addEventListener(ev, tryPlay);
-      });
-
-      // Kick off ASAP; if it's already playing from the autoplay attribute, mark visible
-      tryPlay();
-      if (!vid.paused) vid.classList.add('visible');
-      startRetry();
-
-      // Last-resort gesture fallback for browsers that fully block muted autoplay (e.g. iOS Low Power Mode)
-      function userKick() { tryPlay(); }
-      ['pointerdown', 'touchstart', 'scroll'].forEach(function (ev) {
-        window.addEventListener(ev, userKick, { once: true, passive: true, capture: true });
+      var hero = document.getElementById('heroVideo');
+      function reveal() { hero.classList.add('visible'); }
+      if (hero.complete && hero.naturalWidth > 0) reveal();
+      else hero.addEventListener('load', reveal, { once: true });
+      hero.addEventListener('error', function () {
+        console.error('hero image failed to load');
       });
     })();
   </script>
