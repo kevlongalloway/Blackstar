@@ -172,34 +172,6 @@
 
     .page-header > *:not(.float-star) { position: relative; z-index: 1; }
 
-    /* ──────────── TICKER ──────────── */
-    .ticker {
-      overflow: hidden;
-      background: #f0ede8;
-      padding: 11px 0;
-      white-space: nowrap;
-      border-top: 1px solid rgba(8,8,8,0.2);
-      border-bottom: 1px solid rgba(8,8,8,0.2);
-    }
-
-    .ticker-inner {
-      display: inline-flex;
-      animation: tick 32s linear infinite;
-    }
-
-    .ticker-item {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 13px;
-      color: #080808;
-      padding: 0 32px;
-      letter-spacing: 0.15em;
-    }
-
-    @keyframes tick {
-      from { transform: translateX(0); }
-      to   { transform: translateX(-50%); }
-    }
-
     /* ──────────── YEAR RAIL (sticky) ──────────── */
     .year-rail {
       position: fixed;
@@ -736,20 +708,6 @@
         <span>2023 — Present</span>
       </div>
     </header>
-
-    <!-- ──────────── TICKER ──────────── -->
-    <div class="ticker" aria-hidden="true">
-      <div class="ticker-inner">
-        <span class="ticker-item">FEAR NOBODY</span><span class="ticker-item">★</span>
-        <span class="ticker-item">VILLAGE SKATEPARK</span><span class="ticker-item">★</span>
-        <span class="ticker-item">LOVE IS WAR..?!</span><span class="ticker-item">★</span>
-        <span class="ticker-item">THE ARCHIVE</span><span class="ticker-item">★</span>
-        <span class="ticker-item">FEAR NOBODY</span><span class="ticker-item">★</span>
-        <span class="ticker-item">VILLAGE SKATEPARK</span><span class="ticker-item">★</span>
-        <span class="ticker-item">LOVE IS WAR..?!</span><span class="ticker-item">★</span>
-        <span class="ticker-item">THE ARCHIVE</span><span class="ticker-item">★</span>
-      </div>
-    </div>
 
     <div class="archive">
 
