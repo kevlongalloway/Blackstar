@@ -425,6 +425,160 @@
       cursor: crosshair;
     }
 
+    /* ──────────── COLLAGE LAYOUT (varied sizes, click to view) ────────────
+       Overrides the CSS-columns masonry on collections marked .collage.
+       Items get explicit row/column spans via .size-* modifiers, packed by
+       grid-auto-flow:dense so size variation reads as intentional rhythm. */
+    .collection.collage .collection-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      grid-auto-rows: 90px;
+      grid-auto-flow: dense;
+      gap: 12px;
+      column-count: unset;
+    }
+
+    @media (min-width: 640px) {
+      .collection.collage .collection-grid {
+        grid-auto-rows: 120px;
+        gap: 16px;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .collection.collage .collection-grid {
+        grid-auto-rows: 140px;
+        gap: 20px;
+      }
+    }
+
+    .collection.collage .media-item {
+      break-inside: unset;
+      margin: 0;
+      grid-column: span 3;
+      grid-row: span 2;
+    }
+
+    .collection.collage .media-item img,
+    .collection.collage .media-item video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .collection.collage .media-item.size-large { grid-column: span 4; grid-row: span 4; }
+    .collection.collage .media-item.size-tall  { grid-column: span 3; grid-row: span 4; }
+    .collection.collage .media-item.size-wide  { grid-column: span 4; grid-row: span 3; }
+    .collection.collage .media-item.size-small { grid-column: span 2; grid-row: span 2; }
+
+    @media (max-width: 640px) {
+      .collection.collage .collection-grid {
+        grid-template-columns: repeat(4, 1fr);
+        grid-auto-rows: 80px;
+        gap: 10px;
+      }
+      .collection.collage .media-item { grid-column: span 2; grid-row: span 2; }
+      .collection.collage .media-item.size-large { grid-column: span 4; grid-row: span 4; }
+      .collection.collage .media-item.size-tall  { grid-column: span 2; grid-row: span 3; }
+      .collection.collage .media-item.size-wide  { grid-column: span 4; grid-row: span 2; }
+      .collection.collage .media-item.size-small { grid-column: span 2; grid-row: span 2; }
+    }
+
+    /* Indicator that items are clickable */
+    .media-item { cursor: pointer; }
+
+    /* ──────────── LIGHTBOX ──────────── */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(8, 8, 8, 0.96);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 64px 16px;
+      cursor: crosshair;
+    }
+
+    @media (min-width: 640px) {
+      .lightbox { padding: 72px 40px; }
+    }
+
+    .lightbox.open {
+      display: flex;
+      animation: lb-fade 0.18s ease-out both;
+    }
+
+    @keyframes lb-fade {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    .lightbox-stage {
+      max-width: min(100%, 1200px);
+      max-height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .lightbox-stage img,
+    .lightbox-stage video {
+      max-width: 100%;
+      max-height: 88vh;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      display: block;
+      background: #000;
+    }
+
+    .lightbox-stage video {
+      outline: none;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: none;
+      border: 1px solid rgba(240, 237, 232, 0.2);
+      color: #f0ede8;
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      padding: 10px 16px;
+      cursor: crosshair;
+      opacity: 0.7;
+      transition: opacity 0.2s, border-color 0.2s;
+      z-index: 1002;
+    }
+
+    @media (min-width: 640px) {
+      .lightbox-close { top: 24px; right: 32px; padding: 12px 22px; }
+    }
+
+    .lightbox-close:hover {
+      opacity: 1;
+      border-color: #f0ede8;
+    }
+
+    .lightbox-caption {
+      position: absolute;
+      bottom: 16px;
+      left: 0; right: 0;
+      text-align: center;
+      font-size: 9px;
+      letter-spacing: 0.3em;
+      opacity: 0.35;
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+
+    body.lb-open { overflow: hidden; }
+
     /* Scattered low-opacity stars */
     .scatter-star {
       position: absolute;
@@ -554,8 +708,8 @@
     <div class="nav-links">
       <a href="products.html">Shop</a>
       <!-- <a href="#">Drops</a> -->
-      <a href="archive.html" class="active">Archive</a>
       <a href="about.html">About</a>
+      <a href="archive.html" class="active">Archive</a>
       <a href="cart.html" class="cart-nav-link">Cart</a>
     </div>
   </nav>
@@ -625,42 +779,39 @@
           </div>
         </article>
 
-        <article class="collection">
+        <article class="collection collage">
           <header class="collection-head reveal">
             <span class="sticker" style="--rot:2.4deg" aria-hidden="true">2</span>
             <div class="collection-meta-block">
               <p class="collection-label">— Collection · 2023</p>
               <h3 class="collection-title">VILLAGE SKATEPARK × BLACKSTAR THE BRAND</h3>
-              <p class="collection-count">2023 · 9 pieces</p>
+              <p class="collection-count">2023 · 8 pieces</p>
             </div>
           </header>
           <div class="collection-grid">
-            <figure class="media-item reveal">
+            <figure class="media-item size-large reveal">
               <img src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/IMG_0091.jpeg" alt="Village Skatepark × BLACKSTAR — frame 1" loading="lazy">
             </figure>
             <figure class="media-item reveal">
               <img src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/IMG_0092.jpeg" alt="Village Skatepark × BLACKSTAR — frame 2" loading="lazy">
             </figure>
-            <figure class="media-item reveal">
+            <figure class="media-item size-tall reveal">
               <img src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/IMG_0095.jpeg" alt="Village Skatepark × BLACKSTAR — frame 3" loading="lazy">
             </figure>
             <figure class="media-item reveal">
               <img src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/IMG_0096.jpeg" alt="Village Skatepark × BLACKSTAR — frame 4" loading="lazy">
             </figure>
-            <figure class="media-item reveal">
+            <figure class="media-item size-wide reveal">
               <img src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/IMG_0097.jpeg" alt="Village Skatepark × BLACKSTAR — frame 5" loading="lazy">
             </figure>
             <figure class="media-item reveal">
               <img src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/IMG_0098.jpeg" alt="Village Skatepark × BLACKSTAR — frame 6" loading="lazy">
             </figure>
-            <figure class="media-item reveal">
+            <figure class="media-item size-tall reveal">
               <img src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/IMG_0099.jpeg" alt="Village Skatepark × BLACKSTAR — frame 7" loading="lazy">
             </figure>
             <figure class="media-item reveal">
               <img src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/IMG_0105.jpeg" alt="Village Skatepark × BLACKSTAR — frame 8" loading="lazy">
-            </figure>
-            <figure class="media-item reveal">
-              <img src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/IMG_1306.jpeg" alt="Village Skatepark × BLACKSTAR — frame 9" loading="lazy">
             </figure>
           </div>
         </article>
@@ -702,6 +853,13 @@
     </div>
 
   </main>
+
+  <!-- ──────────── LIGHTBOX ──────────── -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-hidden="true">
+    <button class="lightbox-close" id="lightbox-close" aria-label="Close">Close ✕</button>
+    <div class="lightbox-stage" id="lightbox-stage"></div>
+    <p class="lightbox-caption" id="lightbox-caption"></p>
+  </div>
 
   <footer>
     <div class="footer-top">
@@ -791,6 +949,89 @@
       }
       ['pointerdown', 'click', 'touchstart', 'wheel', 'scroll', 'keydown'].forEach(ev => {
         window.addEventListener(ev, userKick, { once: true, passive: true, capture: true });
+      });
+    })();
+
+    // ──────────── Lightbox: click any media item to view fullscreen with audio ────────────
+    (function lightbox() {
+      const lb       = document.getElementById('lightbox');
+      const stage    = document.getElementById('lightbox-stage');
+      const closeBtn = document.getElementById('lightbox-close');
+      const caption  = document.getElementById('lightbox-caption');
+      if (!lb || !stage) return;
+
+      function open(item) {
+        stage.innerHTML = '';
+        const srcVideo = item.querySelector('video');
+        const srcImg   = item.querySelector('img');
+
+        // Find the enclosing collection title for the caption
+        const article = item.closest('.collection');
+        const title   = article ? article.querySelector('.collection-title') : null;
+        caption.textContent = title ? title.textContent.trim() : '';
+
+        if (srcVideo) {
+          const v = document.createElement('video');
+          v.src         = srcVideo.getAttribute('src');
+          v.controls    = true;
+          v.autoplay    = true;
+          v.loop        = true;
+          v.playsInline = true;
+          v.preload     = 'auto';
+          // Explicitly NOT muted — full audio
+          v.muted = false;
+          stage.appendChild(v);
+          // Some browsers still block autoplay-with-sound until user-initiated;
+          // this click IS the user gesture, so play() should resolve.
+          const p = v.play();
+          if (p && typeof p.catch === 'function') {
+            p.catch(() => {
+              // Fall back to muted autoplay if the browser still refuses;
+              // user can unmute via the controls.
+              v.muted = true;
+              v.play().catch(() => {});
+            });
+          }
+        } else if (srcImg) {
+          const i = document.createElement('img');
+          i.src = srcImg.src;
+          i.alt = srcImg.alt || '';
+          stage.appendChild(i);
+        }
+
+        lb.classList.add('open');
+        lb.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('lb-open');
+      }
+
+      function close() {
+        lb.classList.remove('open');
+        lb.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('lb-open');
+        // Stop any playing video before tearing down (avoids audio bleed)
+        const v = stage.querySelector('video');
+        if (v) { try { v.pause(); } catch (e) {} }
+        stage.innerHTML = '';
+        caption.textContent = '';
+      }
+
+      document.querySelectorAll('.media-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+          // Don't trigger when interacting with native video controls inside the tile
+          // (the tiles have muted, no-controls previews, so this is mostly defensive)
+          if (e.target.tagName === 'VIDEO' && e.target.controls) return;
+          open(item);
+        });
+      });
+
+      closeBtn.addEventListener('click', close);
+      lb.addEventListener('click', (e) => {
+        // Backdrop click closes (clicking the stage area or the bg itself)
+        if (e.target === lb || e.target === stage) close();
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && lb.classList.contains('open')) close();
       });
     })();
 
