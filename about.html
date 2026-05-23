@@ -346,19 +346,37 @@
 
     .kw-row {
       display: flex;
-      align-items: baseline;
-      gap: 20px;
+      align-items: center;
+      gap: 24px;
       position: relative;
     }
 
-    .kw-row .idx {
-      font-family: 'Space Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 0.2em;
-      opacity: 0.35;
-      align-self: flex-start;
-      margin-top: 14px;
+    /* Cut-paper sticker numeral — mirrors the BLACKSTAR logo letters
+       (black distressed glyph on cream paper square, slight rotation). */
+    .sticker {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #f0ede8;
+      color: #080808;
+      font-family: 'Rubik Distressed', 'Bebas Neue', sans-serif;
+      font-size: clamp(34px, 5.2vw, 78px);
+      line-height: 1;
+      padding: 10px 22px 14px;
+      min-width: 72px;
+      letter-spacing: 0;
       flex-shrink: 0;
+      transform: rotate(var(--rot, -3deg));
+      box-shadow:
+        0 2px 0 rgba(0,0,0,0.45),
+        -1px 0 0 rgba(0,0,0,0.2),
+        1px 1px 0 rgba(0,0,0,0.2);
+      /* slightly torn / uneven paper edge */
+      clip-path: polygon(
+        2% 6%, 14% 0%, 36% 4%, 58% 1%, 78% 6%, 96% 2%, 100% 18%,
+        98% 42%, 100% 68%, 97% 92%, 84% 100%, 62% 96%, 40% 100%,
+        18% 97%, 4% 100%, 0% 84%, 3% 58%, 0% 32%, 2% 14%
+      );
     }
 
     .kw-row.right { justify-content: flex-end; text-align: right; }
@@ -528,8 +546,13 @@
     /* Mobile tweaks */
     @media (max-width: 640px) {
       .slam-tag { font-size: clamp(38px, 12vw, 90px); line-height: 1.08; }
-      .kw-stack { font-size: clamp(40px, 14vw, 100px); gap: 8px; }
-      .kw-row .idx { display: none; }
+      .kw-stack { font-size: clamp(40px, 14vw, 100px); gap: 14px; }
+      .kw-row { gap: 14px; }
+      .sticker {
+        font-size: clamp(28px, 9vw, 48px);
+        padding: 8px 16px 11px;
+        min-width: 52px;
+      }
       .manifesto-body { font-size: 16px; line-height: 1.6; }
     }
   </style>
@@ -552,7 +575,7 @@
     <section class="slam">
       <span class="float-star" aria-hidden="true">★</span>
 
-      <p class="slam-label">File 001 — Manifesto</p>
+      <p class="slam-label">Manifesto</p>
 
       <h1 class="slam-tag">
         <span class="line">
@@ -610,7 +633,7 @@
     <!-- ──────────── MANIFESTO ──────────── -->
     <section class="manifesto">
       <div class="manifesto-grid">
-        <p class="manifesto-label reveal">— Doctrine / 002</p>
+        <p class="manifesto-label reveal">— Doctrine</p>
         <p class="manifesto-body reveal">
           A streetwear brand built on <span class="kw">EXPRESSION</span>, <span class="kw">PRESENCE</span>, and <span class="kw">INDIVIDUALITY</span>. Each piece transforms everyday essentials into statements through <span class="kw">TEXTURE</span>, <span class="kw">FORM</span>, and <span class="kw">DESIGN</span>. Rooted in a bold and modern aesthetic, the brand is designed for those who move with confidence and intention.
         </p>
@@ -624,25 +647,25 @@
       <span class="scatter-star" style="bottom: 18%; left: 12%; font-size: 60px;">★</span>
       <span class="scatter-star" style="bottom: 6%; right: 18%; font-size: 100px;">★</span>
 
-      <p class="kw-label">Pillars / 003</p>
+      <p class="kw-label">Pillars</p>
 
       <div class="kw-stack">
         <div class="kw-row reveal">
-          <span class="idx">01</span>
+          <span class="sticker" style="--rot: -4deg;" aria-hidden="true">1</span>
           <span class="word">EXPRESSION</span>
         </div>
         <div class="kw-row right outline reveal">
           <span class="word">PRESENCE</span>
-          <span class="idx">02</span>
+          <span class="sticker" style="--rot: 3deg;" aria-hidden="true">2</span>
         </div>
         <div class="kw-row reveal">
-          <span class="idx">03</span>
+          <span class="sticker" style="--rot: -2deg;" aria-hidden="true">3</span>
           <span class="word">INDIVIDUALITY</span>
         </div>
       </div>
 
       <div class="kw-triad reveal">
-        <p class="triad-label">— Method / Texture · Form · Design</p>
+        <p class="triad-label">— Method</p>
         <span class="triad-word">TEXTURE</span>
         <span class="triad-star">★</span>
         <span class="triad-word">FORM</span>
