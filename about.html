@@ -545,15 +545,57 @@
 
     /* Mobile tweaks */
     @media (max-width: 640px) {
-      .slam-tag { font-size: clamp(38px, 12vw, 90px); line-height: 1.08; }
-      .kw-stack { font-size: clamp(40px, 14vw, 100px); gap: 14px; }
-      .kw-row { gap: 14px; }
+      .slam {
+        padding: 130px 18px 50px;
+      }
+      .slam-tag {
+        font-size: clamp(28px, 9vw, 60px);
+        line-height: 1.1;
+        word-break: break-word;
+      }
+      .keywords {
+        padding: 80px 18px;
+      }
+      .kw-label { margin-bottom: 32px; }
+      .kw-stack {
+        font-size: clamp(26px, 8vw, 56px);
+        line-height: 1.08;
+        gap: 18px;
+      }
+      .kw-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+      .kw-row.right {
+        align-items: flex-end;
+        text-align: right;
+      }
+      .kw-row span.word {
+        max-width: 100%;
+        word-break: break-word;
+      }
       .sticker {
-        font-size: clamp(28px, 9vw, 48px);
-        padding: 8px 16px 11px;
-        min-width: 52px;
+        font-size: clamp(22px, 6vw, 36px);
+        padding: 6px 14px 9px;
+        min-width: 44px;
+      }
+      .kw-triad {
+        gap: 16px 28px;
+      }
+      .kw-triad .triad-word { font-size: clamp(32px, 9vw, 64px); }
+      .kw-triad .triad-star { font-size: clamp(22px, 6vw, 40px); }
+      .manifesto {
+        padding: 80px 18px 90px;
       }
       .manifesto-body { font-size: 16px; line-height: 1.6; }
+      .cta {
+        padding: 90px 18px 110px;
+      }
+      .cta-title {
+        font-size: clamp(36px, 10vw, 80px);
+        line-height: 1.1;
+      }
     }
   </style>
 </head>
