@@ -587,10 +587,22 @@
         min-width: 38px;
       }
       .kw-triad {
-        gap: 14px 24px;
+        display: grid;
+        grid-template-columns: repeat(5, auto);
+        column-gap: 14px;
+        row-gap: 10px;
+        justify-content: start;
+        align-items: baseline;
+        margin-top: 40px;
+        padding-top: 28px;
       }
-      .kw-triad .triad-word { font-size: clamp(28px, 8vw, 56px); }
-      .kw-triad .triad-star { font-size: clamp(20px, 5vw, 36px); }
+      .kw-triad .triad-label {
+        grid-column: 1 / -1;
+        width: auto;
+        margin-bottom: 4px;
+      }
+      .kw-triad .triad-word { font-size: clamp(22px, 6vw, 42px); }
+      .kw-triad .triad-star { font-size: clamp(16px, 4.5vw, 28px); }
       .manifesto {
         padding: 72px 16px 80px;
       }
