@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Archive — BLACKSTAR</title>
   <meta property="og:title" content="Archive — BLACKSTAR">
-  <meta property="og:description" content="The Archive — Past collections from BLACKSTAR.">
+  <meta property="og:description" content="A chronological archive of BLACKSTAR collections.">
   <meta property="og:image" content="https://blackstarthebrand.onrender.com/IMG_1306.jpeg">
   <meta property="og:url" content="https://blackstarthebrand.onrender.com/archive.html">
   <meta property="og:type" content="website">
@@ -27,7 +27,7 @@
       cursor: crosshair;
     }
 
-    /* Subtle vignette + grain (mirrors about.html) */
+    /* Vignette + grain — same family as about.html */
     body::before {
       content: '';
       position: fixed;
@@ -96,23 +96,22 @@
 
     /* ──────────── PAGE HEADER ──────────── */
     .page-header {
-      position: relative;
-      padding: 140px 24px 60px;
+      padding: 140px 24px 56px;
       border-bottom: 1px solid rgba(240,237,232,0.08);
-      margin-bottom: 0;
+      position: relative;
       overflow: hidden;
     }
 
     @media (min-width: 640px) {
-      .page-header { padding: 160px 40px 80px; }
+      .page-header { padding: 160px 40px 72px; }
     }
 
     .page-label {
       font-size: 9px;
-      letter-spacing: 0.4em;
+      letter-spacing: 0.35em;
       opacity: 0.4;
       text-transform: uppercase;
-      margin-bottom: 24px;
+      margin-bottom: 18px;
       display: flex;
       align-items: center;
       gap: 14px;
@@ -132,14 +131,13 @@
       letter-spacing: 0.01em;
     }
 
-    .page-subtitle {
-      font-family: 'Space Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 0.3em;
-      opacity: 0.4;
-      text-transform: uppercase;
+    .page-sub {
       margin-top: 28px;
-      max-width: 560px;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      opacity: 0.45;
+      text-transform: uppercase;
+      max-width: 620px;
       line-height: 1.7;
     }
 
@@ -149,16 +147,15 @@
       align-items: flex-end;
       margin-top: 56px;
       flex-wrap: wrap;
-      gap: 16px;
+      gap: 18px;
       font-size: 9px;
       letter-spacing: 0.3em;
-      opacity: 0.4;
+      opacity: 0.45;
       text-transform: uppercase;
     }
 
-    .page-meta .sep { opacity: 0.6; }
+    .page-meta .sep { opacity: 0.55; }
 
-    /* Floating background star */
     .float-star {
       position: absolute;
       font-family: 'Bebas Neue', sans-serif;
@@ -168,136 +165,169 @@
       opacity: 0.025;
       pointer-events: none;
       user-select: none;
-      bottom: -10%;
+      bottom: -18%;
       right: -8%;
       z-index: 0;
     }
 
     .page-header > *:not(.float-star) { position: relative; z-index: 1; }
 
-    /* ──────────── YEAR RAIL (sticky left edge, desktop only) ──────────── */
+    /* ──────────── TICKER ──────────── */
+    .ticker {
+      overflow: hidden;
+      background: #f0ede8;
+      padding: 11px 0;
+      white-space: nowrap;
+      border-top: 1px solid rgba(8,8,8,0.2);
+      border-bottom: 1px solid rgba(8,8,8,0.2);
+    }
+
+    .ticker-inner {
+      display: inline-flex;
+      animation: tick 32s linear infinite;
+    }
+
+    .ticker-item {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 13px;
+      color: #080808;
+      padding: 0 32px;
+      letter-spacing: 0.15em;
+    }
+
+    @keyframes tick {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    /* ──────────── YEAR RAIL (sticky) ──────────── */
     .year-rail {
       position: fixed;
       top: 50%;
-      left: 14px;
+      left: 18px;
       transform: translateY(-50%);
       z-index: 50;
       display: none;
       flex-direction: column;
-      gap: 24px;
-      align-items: center;
+      gap: 18px;
+      pointer-events: auto;
     }
 
-    @media (min-width: 1100px) {
+    @media (min-width: 1024px) {
       .year-rail { display: flex; }
     }
 
     .year-rail a {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 10px;
-      letter-spacing: 0.4em;
       writing-mode: vertical-rl;
       transform: rotate(180deg);
-      text-decoration: none;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.35em;
       color: #f0ede8;
-      opacity: 0.3;
-      transition: opacity 0.2s;
+      text-decoration: none;
+      opacity: 0.35;
       padding: 8px 4px;
+      border-left: 1px solid rgba(240,237,232,0.12);
+      transition: opacity 0.2s, border-color 0.2s;
+    }
+
+    .year-rail a::before {
+      content: '★';
+      display: block;
+      transform: rotate(-180deg);
+      font-size: 9px;
+      margin-bottom: 6px;
+      opacity: 0.7;
     }
 
     .year-rail a:hover,
-    .year-rail a.active { opacity: 1; }
-
-    .year-rail .rail-dot {
-      width: 5px;
-      height: 5px;
-      background: #f0ede8;
-      opacity: 0.4;
-      border-radius: 50%;
+    .year-rail a.is-current {
+      opacity: 1;
+      border-left-color: #f0ede8;
     }
 
-    /* ──────────── YEAR BLOCK ──────────── */
-    .year-block {
-      padding: 0 24px;
-      border-bottom: 1px solid rgba(240,237,232,0.08);
+    /* ──────────── ARCHIVE BODY ──────────── */
+    .archive {
+      padding: 0 24px 60px;
     }
 
     @media (min-width: 640px) {
-      .year-block { padding: 0 40px; }
+      .archive { padding: 0 40px 80px; }
+    }
+
+    @media (min-width: 1024px) {
+      .archive { padding: 0 80px 100px; }
+    }
+
+    /* Year block & banner */
+    .year-block {
+      padding: 80px 0 40px;
+      border-top: 1px solid rgba(240,237,232,0.08);
+      position: relative;
+    }
+
+    .year-block:first-of-type {
+      border-top: none;
+      padding-top: 60px;
     }
 
     .year-banner {
-      position: relative;
-      padding: 100px 0 40px;
       display: flex;
-      align-items: flex-end;
+      align-items: baseline;
       justify-content: space-between;
       gap: 24px;
-      overflow: hidden;
-    }
-
-    @media (min-width: 640px) {
-      .year-banner { padding: 140px 0 60px; }
+      margin-bottom: 64px;
+      position: relative;
+      flex-wrap: wrap;
     }
 
     .year-num {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(110px, 28vw, 420px);
-      line-height: 0.78;
-      letter-spacing: -0.01em;
+      font-size: clamp(120px, 28vw, 380px);
+      line-height: 0.84;
+      letter-spacing: -0.005em;
     }
 
-    .year-block.outline .year-num {
-      -webkit-text-stroke: 1.5px #f0ede8;
+    /* Alternating chapter rhythm — second year reads as outlined */
+    .year-block:nth-of-type(even) .year-num {
+      -webkit-text-stroke: 2px #f0ede8;
       color: transparent;
     }
 
     .year-tag {
       font-size: 9px;
       letter-spacing: 0.4em;
-      opacity: 0.4;
+      opacity: 0.45;
       text-transform: uppercase;
-      writing-mode: vertical-rl;
-      transform: rotate(180deg);
-      padding: 0 0 12px 12px;
-      flex-shrink: 0;
-      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding-bottom: 18px;
     }
 
-    @media (max-width: 640px) {
-      .year-tag {
-        writing-mode: horizontal-tb;
-        transform: none;
-        padding: 0;
-        margin-bottom: 8px;
-      }
-      .year-banner {
-        flex-direction: column;
-        align-items: flex-start;
-      }
+    .year-tag::before {
+      content: '';
+      width: 28px;
+      height: 1px;
+      background: rgba(240,237,232,0.4);
     }
 
-    /* ──────────── COLLECTION ──────────── */
+    /* Collection card */
     .collection {
-      padding: 60px 0 100px;
-      border-top: 1px solid rgba(240,237,232,0.08);
+      margin-bottom: 88px;
       position: relative;
     }
 
-    .collection:first-of-type {
-      border-top: none;
-    }
+    .collection:last-child { margin-bottom: 0; }
 
     .collection-head {
       display: flex;
       align-items: flex-start;
       gap: 24px;
-      margin-bottom: 48px;
+      padding-bottom: 28px;
+      margin-bottom: 32px;
+      border-bottom: 1px solid rgba(240,237,232,0.08);
       flex-wrap: wrap;
-    }
-
-    @media (min-width: 640px) {
-      .collection-head { gap: 36px; align-items: center; }
     }
 
     .collection-meta-block {
@@ -307,54 +337,27 @@
 
     .collection-label {
       font-size: 9px;
-      letter-spacing: 0.4em;
-      opacity: 0.4;
+      letter-spacing: 0.35em;
+      opacity: 0.45;
       text-transform: uppercase;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .collection-label::before {
-      content: '';
-      width: 24px;
-      height: 1px;
-      background: rgba(240,237,232,0.4);
+      margin-bottom: 14px;
     }
 
     .collection-title {
       font-family: 'Rubik Distressed', 'Bebas Neue', sans-serif;
-      font-size: clamp(32px, 7vw, 80px);
+      font-size: clamp(32px, 6.4vw, 80px);
       line-height: 1.02;
       letter-spacing: 0.01em;
       text-transform: uppercase;
       word-break: break-word;
-      overflow-wrap: break-word;
     }
 
     .collection-count {
+      margin-top: 16px;
       font-size: 9px;
-      letter-spacing: 0.3em;
+      letter-spacing: 0.25em;
       opacity: 0.4;
       text-transform: uppercase;
-      margin-top: 16px;
-    }
-
-    .collection-head::after {
-      content: '';
-      display: block;
-      width: 100%;
-      height: 1px;
-      background: rgba(240,237,232,0.08);
-      margin-top: 0;
-    }
-
-    .collection-rule {
-      width: 100%;
-      height: 1px;
-      background: rgba(240,237,232,0.08);
-      margin: 0 0 40px;
     }
 
     /* Cut-paper sticker numeral — verbatim from about.html */
@@ -383,7 +386,7 @@
       );
     }
 
-    /* ──────────── MEDIA GRID (CSS columns masonry) ──────────── */
+    /* Media grid — CSS columns masonry */
     .collection-grid {
       column-count: 1;
       column-gap: 16px;
@@ -401,20 +404,17 @@
       break-inside: avoid;
       margin: 0 0 16px;
       display: block;
-      position: relative;
       background: #121212;
       border: 1px solid rgba(240,237,232,0.04);
-      transition: transform 0.35s cubic-bezier(0.2, 0.6, 0.2, 1),
-                  border-color 0.35s ease,
-                  box-shadow 0.35s ease;
       overflow: hidden;
+      position: relative;
+      transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
     }
 
     .media-item:hover {
       transform: translateY(-4px);
       border-color: rgba(240,237,232,0.18);
-      box-shadow: 0 12px 28px -8px rgba(0,0,0,0.6),
-                  0 0 0 1px rgba(240,237,232,0.04);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
     }
 
     .media-item img,
@@ -422,40 +422,7 @@
       display: block;
       width: 100%;
       height: auto;
-      object-fit: cover;
-    }
-
-    /* Single-video full-bleed feel for collections with one video (Collection 1) */
-    .collection-grid.single .media-item {
-      max-width: 100%;
-    }
-
-    /* ──────────── TICKER (between year sections) ──────────── */
-    .ticker {
-      overflow: hidden;
-      background: #f0ede8;
-      padding: 11px 0;
-      white-space: nowrap;
-      border-top: 1px solid rgba(8,8,8,0.2);
-      border-bottom: 1px solid rgba(8,8,8,0.2);
-    }
-
-    .ticker-inner {
-      display: inline-flex;
-      animation: tick 32s linear infinite;
-    }
-
-    .ticker-item {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 13px;
-      color: #080808;
-      padding: 0 32px;
-      letter-spacing: 0.15em;
-    }
-
-    @keyframes tick {
-      from { transform: translateX(0); }
-      to   { transform: translateX(-50%); }
+      cursor: crosshair;
     }
 
     /* Scattered low-opacity stars */
@@ -469,54 +436,18 @@
       line-height: 1;
     }
 
-    /* ──────────── REVEAL ON SCROLL ──────────── */
+    /* Reveal on scroll */
     .reveal {
       opacity: 0;
       transform: translateY(24px);
-      transition: opacity 0.9s cubic-bezier(0.2, 0.6, 0.2, 1),
-                  transform 0.9s cubic-bezier(0.2, 0.6, 0.2, 1);
+      transition: opacity 0.9s cubic-bezier(0.2, 0.6, 0.2, 1), transform 0.9s cubic-bezier(0.2, 0.6, 0.2, 1);
     }
     .reveal.in {
       opacity: 1;
       transform: translateY(0);
     }
 
-    /* ──────────── ARCHIVE END ──────────── */
-    .archive-end {
-      padding: 100px 24px 140px;
-      text-align: center;
-      position: relative;
-    }
-
-    @media (min-width: 640px) {
-      .archive-end { padding: 140px 40px 180px; }
-    }
-
-    .archive-end-label {
-      font-size: 9px;
-      letter-spacing: 0.4em;
-      opacity: 0.4;
-      text-transform: uppercase;
-      margin-bottom: 24px;
-    }
-
-    .archive-end-title {
-      font-family: 'Rubik Distressed', 'Bebas Neue', sans-serif;
-      font-size: clamp(40px, 9vw, 120px);
-      line-height: 1.04;
-      letter-spacing: 0.01em;
-      text-transform: uppercase;
-      margin-bottom: 36px;
-    }
-
-    .archive-end-meta {
-      font-size: 9px;
-      letter-spacing: 0.3em;
-      opacity: 0.4;
-      text-transform: uppercase;
-    }
-
-    /* ──────────── FOOTER (verbatim) ──────────── */
+    /* ──────────── FOOTER ──────────── */
     footer {
       background: #f0ede8;
       color: #080808;
@@ -576,21 +507,42 @@
       text-decoration: underline;
     }
 
-    /* ──────────── MOBILE GUARD ──────────── */
+    /* Mobile overflow guards */
     @media (max-width: 640px) {
-      .page-header, .year-block, .archive-end { min-width: 0; max-width: 100vw; }
-      .collection, .collection-head, .collection-grid { min-width: 0; max-width: 100%; }
-      .collection-title { font-size: clamp(28px, 9vw, 56px); }
+      .page-header, .archive, .year-block, .collection { min-width: 0; max-width: 100vw; }
+      .collection-grid, .collection-head, .year-banner { min-width: 0; max-width: 100%; }
+
+      .page-header {
+        padding: 130px 16px 44px;
+      }
+      .page-title {
+        font-size: clamp(44px, 16vw, 96px);
+        line-height: 0.94;
+      }
+      .page-sub { font-size: 10px; }
+
+      .archive { padding: 0 16px 60px; }
+
+      .year-block { padding: 60px 0 24px; }
+      .year-num {
+        font-size: clamp(96px, 32vw, 180px);
+        line-height: 0.88;
+      }
+      .year-banner { margin-bottom: 44px; gap: 12px; }
+      .year-tag { padding-bottom: 8px; }
+
+      .collection { margin-bottom: 64px; }
+
+      .collection-head { gap: 16px; padding-bottom: 20px; margin-bottom: 24px; }
+      .collection-title {
+        font-size: clamp(26px, 9vw, 52px);
+        line-height: 1.06;
+      }
+
       .sticker {
         font-size: clamp(22px, 6vw, 36px);
         padding: 6px 14px 9px;
-        min-width: 44px;
-      }
-      .year-num {
-        font-size: clamp(80px, 32vw, 160px);
-      }
-      .page-title {
-        font-size: clamp(56px, 22vw, 120px);
+        min-width: 46px;
       }
     }
   </style>
@@ -608,10 +560,9 @@
     </div>
   </nav>
 
-  <!-- Sticky year rail (desktop ≥1100px) -->
+  <!-- Sticky left-edge year rail (desktop only) -->
   <aside class="year-rail" aria-label="Years">
     <a href="#y-2023" data-year="2023">2023</a>
-    <span class="rail-dot" aria-hidden="true"></span>
     <a href="#y-2024" data-year="2024">2024</a>
   </aside>
 
@@ -622,8 +573,8 @@
       <span class="float-star" aria-hidden="true">★</span>
       <p class="page-label">The Archive</p>
       <h1 class="page-title">ARCHIVE</h1>
-      <p class="page-subtitle">
-        A chronological record of past BLACKSTAR collections — campaigns, capsules, and collaborations preserved here for the record.
+      <p class="page-sub">
+        A chronological record of every BLACKSTAR collection — pieces, presence, and the people who carried them.
       </p>
       <div class="page-meta">
         <span>★ Est. BLACKSTAR</span>
@@ -632,77 +583,8 @@
       </div>
     </header>
 
-    <!-- ──────────── 2023 ──────────── -->
-    <section class="year-block" id="y-2023">
-      <header class="year-banner">
-        <h2 class="year-num">2023</h2>
-        <span class="year-tag">— Chapter 01 ★ Inception</span>
-      </header>
-
-      <!-- Collection 1 -->
-      <article class="collection reveal">
-        <header class="collection-head">
-          <span class="sticker" style="--rot:-3deg;" aria-hidden="true">1</span>
-          <div class="collection-meta-block">
-            <p class="collection-label">Collection · 2023</p>
-            <h3 class="collection-title">FEAR NOBODY</h3>
-            <p class="collection-count">2023 · 1 piece</p>
-          </div>
-        </header>
-        <div class="collection-rule"></div>
-        <div class="collection-grid single">
-          <figure class="media-item">
-            <video src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/Blackstar_2023.mp4"
-                   muted loop playsinline preload="metadata" autoplay></video>
-          </figure>
-        </div>
-      </article>
-
-      <!-- Collection 2 -->
-      <article class="collection reveal">
-        <header class="collection-head">
-          <span class="sticker" style="--rot:2deg;" aria-hidden="true">2</span>
-          <div class="collection-meta-block">
-            <p class="collection-label">Collection · 2023 · Collab</p>
-            <h3 class="collection-title">VILLAGE SKATEPARK × BLACKSTAR THE BRAND</h3>
-            <p class="collection-count">2023 · 9 pieces</p>
-          </div>
-        </header>
-        <div class="collection-rule"></div>
-        <div class="collection-grid">
-          <figure class="media-item">
-            <img src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/IMG_0091.jpeg" alt="Village Skatepark × BlackStar — 01" loading="lazy">
-          </figure>
-          <figure class="media-item">
-            <img src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/IMG_0092.jpeg" alt="Village Skatepark × BlackStar — 02" loading="lazy">
-          </figure>
-          <figure class="media-item">
-            <img src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/IMG_0095.jpeg" alt="Village Skatepark × BlackStar — 03" loading="lazy">
-          </figure>
-          <figure class="media-item">
-            <img src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/IMG_0096.jpeg" alt="Village Skatepark × BlackStar — 04" loading="lazy">
-          </figure>
-          <figure class="media-item">
-            <img src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/IMG_0097.jpeg" alt="Village Skatepark × BlackStar — 05" loading="lazy">
-          </figure>
-          <figure class="media-item">
-            <img src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/IMG_0098.jpeg" alt="Village Skatepark × BlackStar — 06" loading="lazy">
-          </figure>
-          <figure class="media-item">
-            <img src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/IMG_0099.jpeg" alt="Village Skatepark × BlackStar — 07" loading="lazy">
-          </figure>
-          <figure class="media-item">
-            <img src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/IMG_0105.jpeg" alt="Village Skatepark × BlackStar — 08" loading="lazy">
-          </figure>
-          <figure class="media-item">
-            <img src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/IMG_1306.jpeg" alt="Village Skatepark × BlackStar — 09" loading="lazy">
-          </figure>
-        </div>
-      </article>
-    </section>
-
-    <!-- ──────────── TICKER (between years) ──────────── -->
-    <div class="ticker">
+    <!-- ──────────── TICKER ──────────── -->
+    <div class="ticker" aria-hidden="true">
       <div class="ticker-inner">
         <span class="ticker-item">FEAR NOBODY</span><span class="ticker-item">★</span>
         <span class="ticker-item">VILLAGE SKATEPARK</span><span class="ticker-item">★</span>
@@ -715,53 +597,109 @@
       </div>
     </div>
 
-    <!-- ──────────── 2024 ──────────── -->
-    <section class="year-block outline" id="y-2024">
-      <span class="scatter-star" style="top: 12%; right: 6%; font-size: 120px;">★</span>
-      <span class="scatter-star" style="bottom: 14%; left: 8%; font-size: 80px;">★</span>
+    <div class="archive">
 
-      <header class="year-banner">
-        <h2 class="year-num">2024</h2>
-        <span class="year-tag">— Chapter 02 ★ Escalation</span>
-      </header>
+      <!-- ──────────── 2023 ──────────── -->
+      <section class="year-block" id="y-2023">
+        <span class="scatter-star" style="top: 12%; right: 6%; font-size: 120px;">★</span>
+        <span class="scatter-star" style="bottom: 8%; left: 4%; font-size: 80px;">★</span>
 
-      <!-- Collection 3 -->
-      <article class="collection reveal">
-        <header class="collection-head">
-          <span class="sticker" style="--rot:-4deg;" aria-hidden="true">3</span>
-          <div class="collection-meta-block">
-            <p class="collection-label">Collection · 2024</p>
-            <h3 class="collection-title">LOVE IS WAR..?!</h3>
-            <p class="collection-count">2024 · 3 pieces</p>
-          </div>
+        <header class="year-banner reveal">
+          <h2 class="year-num">2023</h2>
+          <span class="year-tag">Inception · Chapter I</span>
         </header>
-        <div class="collection-rule"></div>
-        <div class="collection-grid">
-          <figure class="media-item">
-            <video src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/2024_1.mp4"
-                   muted loop playsinline preload="metadata" autoplay></video>
-          </figure>
-          <figure class="media-item">
-            <video src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/2024_2.mp4"
-                   muted loop playsinline preload="metadata" autoplay></video>
-          </figure>
-          <figure class="media-item">
-            <video src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/2024_3.mp4"
-                   muted loop playsinline preload="metadata" autoplay></video>
-          </figure>
-        </div>
-      </article>
-    </section>
 
-    <!-- ──────────── ARCHIVE END ──────────── -->
-    <section class="archive-end">
-      <span class="scatter-star" style="top: 10%; left: 10%; font-size: 60px;">★</span>
-      <span class="scatter-star" style="bottom: 12%; right: 12%; font-size: 90px;">★</span>
+        <article class="collection">
+          <header class="collection-head reveal">
+            <span class="sticker" style="--rot:-3deg" aria-hidden="true">1</span>
+            <div class="collection-meta-block">
+              <p class="collection-label">— Collection · 2023</p>
+              <h3 class="collection-title">FEAR NOBODY</h3>
+              <p class="collection-count">2023 · 1 piece</p>
+            </div>
+          </header>
+          <div class="collection-grid">
+            <figure class="media-item reveal">
+              <video src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/Blackstar_2023.mp4" muted loop playsinline preload="metadata" autoplay></video>
+            </figure>
+          </div>
+        </article>
 
-      <p class="archive-end-label reveal">— End Of Record</p>
-      <h2 class="archive-end-title reveal">MORE<br>TO COME.</h2>
-      <p class="archive-end-meta reveal">★ The archive continues. ★</p>
-    </section>
+        <article class="collection">
+          <header class="collection-head reveal">
+            <span class="sticker" style="--rot:2.4deg" aria-hidden="true">2</span>
+            <div class="collection-meta-block">
+              <p class="collection-label">— Collection · 2023</p>
+              <h3 class="collection-title">VILLAGE SKATEPARK × BLACKSTAR THE BRAND</h3>
+              <p class="collection-count">2023 · 9 pieces</p>
+            </div>
+          </header>
+          <div class="collection-grid">
+            <figure class="media-item reveal">
+              <img src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/IMG_0091.jpeg" alt="Village Skatepark × BLACKSTAR — frame 1" loading="lazy">
+            </figure>
+            <figure class="media-item reveal">
+              <img src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/IMG_0092.jpeg" alt="Village Skatepark × BLACKSTAR — frame 2" loading="lazy">
+            </figure>
+            <figure class="media-item reveal">
+              <img src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/IMG_0095.jpeg" alt="Village Skatepark × BLACKSTAR — frame 3" loading="lazy">
+            </figure>
+            <figure class="media-item reveal">
+              <img src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/IMG_0096.jpeg" alt="Village Skatepark × BLACKSTAR — frame 4" loading="lazy">
+            </figure>
+            <figure class="media-item reveal">
+              <img src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/IMG_0097.jpeg" alt="Village Skatepark × BLACKSTAR — frame 5" loading="lazy">
+            </figure>
+            <figure class="media-item reveal">
+              <img src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/IMG_0098.jpeg" alt="Village Skatepark × BLACKSTAR — frame 6" loading="lazy">
+            </figure>
+            <figure class="media-item reveal">
+              <img src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/IMG_0099.jpeg" alt="Village Skatepark × BLACKSTAR — frame 7" loading="lazy">
+            </figure>
+            <figure class="media-item reveal">
+              <img src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/IMG_0105.jpeg" alt="Village Skatepark × BLACKSTAR — frame 8" loading="lazy">
+            </figure>
+            <figure class="media-item reveal">
+              <img src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/IMG_1306.jpeg" alt="Village Skatepark × BLACKSTAR — frame 9" loading="lazy">
+            </figure>
+          </div>
+        </article>
+      </section>
+
+      <!-- ──────────── 2024 ──────────── -->
+      <section class="year-block" id="y-2024">
+        <span class="scatter-star" style="top: 14%; left: 8%; font-size: 100px;">★</span>
+        <span class="scatter-star" style="bottom: 12%; right: 10%; font-size: 140px;">★</span>
+
+        <header class="year-banner reveal">
+          <h2 class="year-num">2024</h2>
+          <span class="year-tag">Escalation · Chapter II</span>
+        </header>
+
+        <article class="collection">
+          <header class="collection-head reveal">
+            <span class="sticker" style="--rot:-2deg" aria-hidden="true">3</span>
+            <div class="collection-meta-block">
+              <p class="collection-label">— Collection · 2024</p>
+              <h3 class="collection-title">LOVE IS WAR..?!</h3>
+              <p class="collection-count">2024 · 3 pieces</p>
+            </div>
+          </header>
+          <div class="collection-grid">
+            <figure class="media-item reveal">
+              <video src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/2024_1.mp4" muted loop playsinline preload="metadata" autoplay></video>
+            </figure>
+            <figure class="media-item reveal">
+              <video src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/2024_2.mp4" muted loop playsinline preload="metadata" autoplay></video>
+            </figure>
+            <figure class="media-item reveal">
+              <video src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/2024_3.mp4" muted loop playsinline preload="metadata" autoplay></video>
+            </figure>
+          </div>
+        </article>
+      </section>
+
+    </div>
 
   </main>
 
@@ -785,7 +723,7 @@
   <script src="config.js"></script>
   <script src="cart.js"></script>
   <script>
-    // ──────────── Reveal on scroll ────────────
+    // ──────────── Scroll reveal ────────────
     (function scrollReveal() {
       if (!('IntersectionObserver' in window)) {
         document.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
@@ -802,27 +740,32 @@
       document.querySelectorAll('.reveal').forEach(el => io.observe(el));
     })();
 
-    // ──────────── Video autoplay belt-and-suspenders ────────────
-    // Some browsers only respect muted as a property for autoplay.
-    document.querySelectorAll('.media-item video').forEach(v => {
-      v.muted = true;
-      v.defaultMuted = true;
-      const p = v.play();
-      if (p && typeof p.catch === 'function') p.catch(() => {});
-    });
-
-    // ──────────── Lazy play / pause videos on scroll ────────────
-    (function lazyVideoPlay() {
+    // ──────────── Lazy video play/pause (bandwidth saver) ────────────
+    (function lazyVideos() {
       const videos = document.querySelectorAll('.media-item video');
-      if (!videos.length) return;
+
+      // Belt-and-suspenders: force muted *property* for iOS/Safari autoplay
+      videos.forEach(v => {
+        v.muted = true;
+        v.defaultMuted = true;
+        v.setAttribute('muted', '');
+        v.addEventListener('loadedmetadata', () => {
+          v.muted = true;
+          const p = v.play();
+          if (p && typeof p.catch === 'function') p.catch(() => {});
+        });
+      });
+
       if (!('IntersectionObserver' in window)) {
-        videos.forEach(v => { try { v.play(); } catch(e){} });
+        videos.forEach(v => { const p = v.play(); if (p && p.catch) p.catch(() => {}); });
         return;
       }
+
       const io = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           const v = entry.target;
           if (entry.isIntersecting) {
+            v.muted = true;
             const p = v.play();
             if (p && typeof p.catch === 'function') p.catch(() => {});
           } else {
@@ -830,43 +773,50 @@
           }
         });
       }, { rootMargin: '200px 0px', threshold: 0 });
-      videos.forEach(v => io.observe(v));
-    })();
 
-    // Broad fallback: kick videos on first user gesture (mobile/Safari)
-    (function userKickVideos() {
+      videos.forEach(v => io.observe(v));
+
+      // Broad fallback for browsers that block autoplay until any user gesture
       let kicked = false;
-      function kick() {
+      function userKick() {
         if (kicked) return;
         kicked = true;
-        document.querySelectorAll('.media-item video').forEach(v => {
-          v.muted = true;
-          const p = v.play();
-          if (p && typeof p.catch === 'function') p.catch(() => {});
+        videos.forEach(v => {
+          if (v.paused) {
+            v.muted = true;
+            const p = v.play();
+            if (p && typeof p.catch === 'function') p.catch(() => {});
+          }
         });
       }
       ['pointerdown', 'click', 'touchstart', 'wheel', 'scroll', 'keydown'].forEach(ev => {
-        window.addEventListener(ev, kick, { once: true, passive: true, capture: true });
+        window.addEventListener(ev, userKick, { once: true, passive: true, capture: true });
       });
     })();
 
-    // ──────────── Year rail active state on scroll ────────────
-    (function yearRailActive() {
+    // ──────────── Sticky year rail highlight ────────────
+    (function yearRail() {
       const links = document.querySelectorAll('.year-rail a');
-      if (!links.length) return;
-      const sections = Array.from(links).map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
-      if (!sections.length) return;
+      if (!links.length || !('IntersectionObserver' in window)) return;
 
-      function update() {
-        const y = window.scrollY + window.innerHeight * 0.35;
-        let activeIdx = 0;
-        sections.forEach((s, i) => {
-          if (s.offsetTop <= y) activeIdx = i;
+      const byId = {};
+      links.forEach(a => {
+        const id = a.getAttribute('href').slice(1);
+        byId[id] = a;
+      });
+
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          const a = byId[entry.target.id];
+          if (!a) return;
+          if (entry.isIntersecting) {
+            links.forEach(l => l.classList.remove('is-current'));
+            a.classList.add('is-current');
+          }
         });
-        links.forEach((a, i) => a.classList.toggle('active', i === activeIdx));
-      }
-      window.addEventListener('scroll', update, { passive: true });
-      update();
+      }, { rootMargin: '-40% 0px -50% 0px', threshold: 0 });
+
+      document.querySelectorAll('.year-block').forEach(s => io.observe(s));
     })();
   </script>
 
