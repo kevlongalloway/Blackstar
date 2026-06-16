@@ -44,6 +44,7 @@
       font-size: 18px;
       letter-spacing: 0.2em;
       opacity: 0.8;
+      transition: color 0.45s ease;
     }
 
     .nav-links {
@@ -58,10 +59,14 @@
       letter-spacing: 0.2em;
       opacity: 0.5;
       text-transform: uppercase;
-      transition: opacity 0.2s;
+      transition: opacity 0.2s, color 0.45s ease;
     }
 
     .nav-links a:hover { opacity: 1; }
+
+    /* While the bright hero video is behind the nav, switch text to black for contrast */
+    nav.on-video .nav-mark,
+    nav.on-video .nav-links a { color: #080808; }
 
     /* Hero */
     .hero {
@@ -375,7 +380,11 @@
   </nav>
 
   <section class="hero">
-    <video id="heroVideo" class="hero-video" src="https://pub-1a71d6fe08994f2daf1877353b918043.r2.dev/video-output-1821AA33-9B11-4A96-951B-206F07D4DA2A-1.mp4" muted playsinline autoplay preload="auto"></video>
+    <video id="heroVideo" class="hero-video"
+           src="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/Blackstar_2023.mp4"
+           data-src-small="https://pub-f28373213d2c46b88556176ca92ee82e.r2.dev/Blackstar_2023.mp4"
+           data-src-large="https://pub-1a71d6fe08994f2daf1877353b918043.r2.dev/video-output-1821AA33-9B11-4A96-951B-206F07D4DA2A-1.mp4"
+           muted playsinline autoplay preload="auto"></video>
     <div class="hero-logo" aria-label="BLACKSTAR">
       <img class="logo-sizer" src="IMG_1309.png" alt="BLACKSTAR">
       <img class="logo-clip" src="IMG_1309.png" alt="" style="--cl:0%;     --cr:88.89%; --rot:-1.8deg; --d:0.00s">
@@ -500,11 +509,39 @@
   <script>
     (function () {
       var vid = document.getElementById('heroVideo');
+      var nav = document.querySelector('nav');
+      var hero = document.querySelector('.hero');
       var restartTimer = null;
 
       // Belt-and-suspenders: some browsers only respect the muted *property* for autoplay
       vid.muted = true;
       vid.defaultMuted = true;
+
+      // ──── Pick the right source for the viewport (heavier clip on bigger screens) ────
+      var largeQuery = window.matchMedia('(min-width: 1024px)');
+      function pickSource() {
+        var url = largeQuery.matches
+          ? vid.getAttribute('data-src-large')
+          : vid.getAttribute('data-src-small');
+        if (url && vid.getAttribute('src') !== url) {
+          vid.setAttribute('src', url);
+          vid.load();
+          tryPlay();
+        }
+      }
+      if (largeQuery.addEventListener) {
+        largeQuery.addEventListener('change', pickSource);
+      } else if (largeQuery.addListener) {
+        largeQuery.addListener(pickSource); // older Safari
+      }
+
+      // ──── Nav contrast: black text only while the bright video is behind the nav ────
+      function updateNav() {
+        var overVideo = vid.classList.contains('visible') &&
+                        hero.getBoundingClientRect().bottom > 80;
+        nav.classList.toggle('on-video', overVideo);
+      }
+      window.addEventListener('scroll', updateNav, { passive: true });
 
       function tryPlay() {
         var p = vid.play();
@@ -515,6 +552,7 @@
 
       function fadeOut() {
         vid.classList.remove('visible');
+        updateNav();
         restartTimer = setTimeout(function () {
           vid.currentTime = 0;
           tryPlay();
@@ -526,6 +564,7 @@
       vid.addEventListener('playing', function () {
         clearTimeout(restartTimer);
         vid.classList.add('visible');
+        updateNav();
       });
 
       vid.addEventListener('error', function () {
@@ -533,8 +572,10 @@
       });
 
       // Kick off ASAP; if it's already playing from the autoplay attribute, mark visible
+      pickSource();
       tryPlay();
       if (!vid.paused) vid.classList.add('visible');
+      updateNav();
 
       // Broad fallback for browsers that block autoplay until any user gesture
       var kicked = false;
