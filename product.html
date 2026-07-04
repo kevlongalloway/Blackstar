@@ -64,15 +64,20 @@
       }
     }
 
-    /* Image */
+    /* Image gallery */
+    .product-gallery {
+      position: relative;
+      width: 100%;
+      margin-bottom: 32px;
+    }
+    @media (min-width: 768px) { .product-gallery { margin-bottom: 0; } }
+
     .product-image {
       aspect-ratio: 3/4;
       background: #121212;
       overflow: hidden;
       width: 100%;
-      margin-bottom: 32px;
     }
-    @media (min-width: 768px) { .product-image { margin-bottom: 0; } }
     .product-image img {
       width: 100%;
       height: 100%;
@@ -88,6 +93,96 @@
       font-family: 'Bebas Neue', sans-serif;
       font-size: 48px;
       letter-spacing: 0.2em;
+    }
+
+    /* Swipeable track */
+    .gallery-track {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      aspect-ratio: 3/4;
+      background: #121212;
+    }
+    .gallery-track::-webkit-scrollbar { display: none; }
+    .gallery-slide {
+      flex: 0 0 100%;
+      width: 100%;
+      height: 100%;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+    }
+    .gallery-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* Arrows */
+    .gallery-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 40px;
+      height: 40px;
+      background: rgba(8,8,8,0.55);
+      border: 1px solid rgba(240,237,232,0.2);
+      color: #f0ede8;
+      font-family: 'Space Mono', monospace;
+      font-size: 16px;
+      cursor: crosshair;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+      z-index: 2;
+    }
+    .gallery-arrow:hover { opacity: 1; }
+    .gallery-arrow.prev { left: 12px; }
+    .gallery-arrow.next { right: 12px; }
+    @media (min-width: 768px) {
+      .product-gallery.has-multiple:hover .gallery-arrow { display: flex; }
+    }
+
+    /* Dots */
+    .gallery-dots {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .gallery-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(240,237,232,0.25);
+      border: none;
+      padding: 0;
+      cursor: crosshair;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .gallery-dot.active {
+      background: #f0ede8;
+      transform: scale(1.3);
+    }
+
+    /* Counter */
+    .gallery-counter {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      background: rgba(8,8,8,0.55);
+      color: #f0ede8;
+      font-size: 9px;
+      letter-spacing: 0.15em;
+      padding: 5px 9px;
+      z-index: 2;
     }
 
     /* Info */
@@ -387,7 +482,7 @@
     function render(product) {
       const page   = document.getElementById('product-page');
       const stock  = stockLabel(product);
-      const image  = product.images && product.images[0] ? product.images[0] : null;
+      const images = Array.isArray(product.images) ? product.images.filter(Boolean) : [];
       const avail  = product.active && (product.stock === -1 || product.stock > 0);
       // Support metadata.variants [{size,stock},...] (from admin UI)
       // and metadata.sizes ["S","M",...] (flat array) as fallback
@@ -400,10 +495,28 @@
 
       page.innerHTML = `
         <div class="product-layout">
-          <div class="product-image">
-            ${image
-              ? `<img src="${image}" alt="${product.name}">`
-              : `<div class="product-image-placeholder">BST★</div>`}
+          <div class="product-gallery${images.length > 1 ? ' has-multiple' : ''}">
+            ${images.length > 0 ? `
+              <div class="gallery-track" id="gallery-track">
+                ${images.map((src, i) => `
+                  <div class="gallery-slide">
+                    <img src="${src}" alt="${product.name} — image ${i + 1}" ${i === 0 ? '' : 'loading="lazy"'}>
+                  </div>`).join('')}
+              </div>
+              ${images.length > 1 ? `
+                <button class="gallery-arrow prev" id="gallery-prev" aria-label="Previous image">‹</button>
+                <button class="gallery-arrow next" id="gallery-next" aria-label="Next image">›</button>
+                <div class="gallery-counter" id="gallery-counter">1 / ${images.length}</div>
+              ` : ''}
+            ` : `
+              <div class="product-image">
+                <div class="product-image-placeholder">BST★</div>
+              </div>
+            `}
+            ${images.length > 1 ? `
+            <div class="gallery-dots" id="gallery-dots">
+              ${images.map((_, i) => `<button class="gallery-dot${i === 0 ? ' active' : ''}" data-index="${i}" aria-label="Go to image ${i + 1}"></button>`).join('')}
+            </div>` : ''}
           </div>
           <div class="product-info">
             <a href="products.html" class="product-back">← All Products</a>
@@ -431,6 +544,45 @@
             <a href="cart.html" class="btn-buy">View Cart →</a>
           </div>
         </div>`;
+
+      // Image gallery (swipeable)
+      if (images.length > 1) {
+        const track   = document.getElementById('gallery-track');
+        const dots    = Array.from(page.querySelectorAll('.gallery-dot'));
+        const counter = document.getElementById('gallery-counter');
+        let current   = 0;
+
+        const goTo = (i) => {
+          current = Math.max(0, Math.min(images.length - 1, i));
+          track.scrollTo({ left: current * track.clientWidth, behavior: 'smooth' });
+        };
+
+        const setActive = (i) => {
+          dots.forEach((d, di) => d.classList.toggle('active', di === i));
+          if (counter) counter.textContent = `${i + 1} / ${images.length}`;
+        };
+
+        // Sync indicators to the current scroll position (covers swipe + arrows + dots)
+        let raf = null;
+        track.addEventListener('scroll', () => {
+          if (raf) return;
+          raf = requestAnimationFrame(() => {
+            raf = null;
+            const i = Math.round(track.scrollLeft / track.clientWidth);
+            if (i !== current) { current = i; setActive(i); }
+          });
+        });
+
+        document.getElementById('gallery-prev').addEventListener('click', () => goTo(current - 1));
+        document.getElementById('gallery-next').addEventListener('click', () => goTo(current + 1));
+        dots.forEach(d => d.addEventListener('click', () => goTo(parseInt(d.dataset.index, 10))));
+
+        // Keyboard navigation
+        page.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowLeft')  goTo(current - 1);
+          if (e.key === 'ArrowRight') goTo(current + 1);
+        });
+      }
 
       // Quantity controls
       const qtyInput = document.getElementById('qty-val');
