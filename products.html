@@ -157,6 +157,97 @@
       transform: scale(1.06);
     }
 
+    /* Swipable image carousel */
+    .card-media {
+      position: relative;
+      aspect-ratio: 3/4;
+      background: #121212;
+      overflow: hidden;
+    }
+
+    .card-track {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .card-track::-webkit-scrollbar { display: none; }
+
+    .card-slide {
+      flex: 0 0 100%;
+      width: 100%;
+      height: 100%;
+      scroll-snap-align: start;
+    }
+
+    .card-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+      display: block;
+    }
+
+    .card:hover .card-slide img { transform: scale(1.06); }
+
+    .card-dots {
+      position: absolute;
+      left: 0; right: 0; bottom: 10px;
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .card-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: rgba(240,237,232,0.35);
+      transition: background 0.25s, transform 0.25s;
+    }
+
+    .card-dot.active {
+      background: #f0ede8;
+      transform: scale(1.3);
+    }
+
+    .card-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 32px;
+      height: 32px;
+      background: rgba(8,8,8,0.5);
+      color: #f0ede8;
+      border: none;
+      font-family: 'Space Mono', monospace;
+      font-size: 16px;
+      line-height: 1;
+      cursor: crosshair;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s;
+      z-index: 3;
+    }
+
+    .card-media:hover .card-arrow { opacity: 0.7; }
+    .card-arrow:hover { opacity: 1; }
+    .card-arrow.prev { left: 6px; }
+    .card-arrow.next { right: 6px; }
+
+    @media (hover: none) {
+      .card-arrow { display: none; }
+    }
+
     .card-info {
       padding: 12px 2px 4px;
     }
@@ -316,22 +407,85 @@
         }
         countEl.textContent = all.length + ' item' + (all.length !== 1 ? 's' : '');
         grid.innerHTML = all.map(product => {
-          const image = product.images && product.images[0] ? product.images[0] : null;
+          const images = Array.isArray(product.images) ? product.images.filter(Boolean) : [];
+          let media;
+          if (images.length > 1) {
+            const slides = images.map(src =>
+              `<div class="card-slide"><img src="${src}" alt="${product.name}" loading="lazy"></div>`
+            ).join('');
+            const dots = images.map((_, i) =>
+              `<span class="card-dot${i === 0 ? ' active' : ''}"></span>`
+            ).join('');
+            media = `
+              <div class="card-media">
+                <div class="card-track">${slides}</div>
+                <button type="button" class="card-arrow prev" aria-label="Previous image">‹</button>
+                <button type="button" class="card-arrow next" aria-label="Next image">›</button>
+                <div class="card-dots">${dots}</div>
+              </div>`;
+          } else {
+            const image = images[0] || null;
+            media = `
+              <div class="card-img">
+                ${image ? `<img src="${image}" alt="${product.name}" loading="lazy">` : ''}
+              </div>`;
+          }
           return `
           <a href="product.html?id=${product.id}" class="card">
-            <div class="card-img">
-              ${image ? `<img src="${image}" alt="${product.name}" loading="lazy">` : ''}
-            </div>
+            ${media}
             <div class="card-info">
               <span class="card-name">${product.name}</span>
               <span class="card-price">${formatPrice(product.price, product.currency)}</span>
             </div>
           </a>`;
         }).join('');
+
+        initCarousels(grid);
       } catch (err) {
         console.error('Failed to load products:', err.message);
         grid.innerHTML = '<p class="state-msg">Error loading products.</p>';
       }
+    }
+
+    function initCarousels(root) {
+      root.querySelectorAll('.card-media').forEach(media => {
+        const track = media.querySelector('.card-track');
+        const dots  = Array.from(media.querySelectorAll('.card-dot'));
+        const prev  = media.querySelector('.card-arrow.prev');
+        const next  = media.querySelector('.card-arrow.next');
+        if (!track) return;
+
+        const slideCount = dots.length;
+        const currentIndex = () => Math.round(track.scrollLeft / track.clientWidth);
+
+        // Update active dot as the user swipes/scrolls
+        let raf = null;
+        track.addEventListener('scroll', () => {
+          if (raf) return;
+          raf = requestAnimationFrame(() => {
+            raf = null;
+            const i = currentIndex();
+            dots.forEach((d, di) => d.classList.toggle('active', di === i));
+          });
+        });
+
+        const goTo = i => {
+          const clamped = Math.max(0, Math.min(slideCount - 1, i));
+          track.scrollTo({ left: clamped * track.clientWidth, behavior: 'smooth' });
+        };
+
+        // Arrow buttons live inside the card's <a>, so stop navigation
+        const arrow = (el, dir) => {
+          if (!el) return;
+          el.addEventListener('click', e => {
+            e.preventDefault();
+            e.stopPropagation();
+            goTo(currentIndex() + dir);
+          });
+        };
+        arrow(prev, -1);
+        arrow(next, 1);
+      });
     }
 
     document.addEventListener('DOMContentLoaded', loadProducts);
