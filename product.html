@@ -656,14 +656,77 @@
 
     // ─── Products you may like ─────────────────────────────────────────────
     const RELATED_LIMIT = 4;
-    // Brand-wide words carry no signal — every piece is a BLACKSTAR piece.
-    const STOP_WORDS = new Set(['the', 'and', 'for', 'with', 'blackstar', 'bst']);
+    // At most this many pieces sharing one name, so a title the shop lists
+    // several times ("Reworked Jean Jackets") can't fill the whole row.
+    const MAX_PER_NAME = 2;
+    // Words that say nothing about what a piece is.
+    const STOP_WORDS = new Set(['the', 'and', 'for', 'with', 'blackstar', 'bst', 'size', 'new']);
 
-    function nameTokens(product) {
-      return (product.name || '')
+    // Crude singular-ise so "jackets" matches "jacket", "jeans" matches "jean".
+    function stem(token) {
+      if (token.length > 4 && token.endsWith('ies')) return token.slice(0, -3) + 'y';
+      if (token.length > 4 && token.endsWith('es'))  return token.slice(0, -2);
+      if (token.length > 3 && token.endsWith('s'))   return token.slice(0, -1);
+      return token;
+    }
+
+    // '"Red" Reconstructed Jeans' -> ['red', 'reconstructed', 'jean']
+    function nameTokens(name) {
+      return String(name || '')
         .toLowerCase()
         .split(/[^a-z0-9]+/)
-        .filter(t => t.length > 2 && !STOP_WORDS.has(t));
+        .filter(t => t.length > 1 && !STOP_WORDS.has(t))
+        .map(stem);
+    }
+
+    // A word most of the catalog shares ("red" when nearly every piece is from
+    // the Red collection) says far less about similarity than a rare one
+    // ("bucket", "skirt"), so weight each word by how uncommon it is. Without
+    // this every Red piece ties with every other Red piece and the row stops
+    // depending on which product you are looking at.
+    function buildWordWeights(catalog) {
+      const appearsIn = new Map();
+      catalog.forEach(p => {
+        new Set(nameTokens(p.name)).forEach(t => appearsIn.set(t, (appearsIn.get(t) || 0) + 1));
+      });
+      const weights = new Map();
+      appearsIn.forEach((count, t) => {
+        weights.set(t, Math.log((catalog.length + 1) / (count + 1)) + 0.1);
+      });
+      return weights;
+    }
+
+    // Share of weight the two names hold in common, 0 (nothing) to 1 (same
+    // words). Dividing by both totals keeps long names from winning on length.
+    function nameOverlap(tokensA, tokensB, weights) {
+      const setA = new Set(tokensA);
+      const setB = new Set(tokensB);
+      const weightOf = t => (weights.get(t) || 1);
+      let shared = 0, totalA = 0, totalB = 0;
+      setA.forEach(t => { totalA += weightOf(t); if (setB.has(t)) shared += weightOf(t); });
+      setB.forEach(t => { totalB += weightOf(t); });
+      return totalA + totalB === 0 ? 0 : (2 * shared) / (totalA + totalB);
+    }
+
+    function bigrams(name) {
+      const flat = String(name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+      const pairs = [];
+      for (let i = 0; i < flat.length - 1; i++) pairs.push(flat.slice(i, i + 2));
+      return pairs;
+    }
+
+    // Letter-level overlap, which catches near-misses whole words miss —
+    // "Denim Tie-Dye Long Skirt" against "Denim Tie- Dye Crop Tee".
+    function spellingOverlap(nameA, nameB) {
+      const a = bigrams(nameA);
+      const pool = bigrams(nameB);
+      if (!a.length || !pool.length) return 0;
+      let hits = 0;
+      a.forEach(pair => {
+        const at = pool.indexOf(pair);
+        if (at >= 0) { pool.splice(at, 1); hits++; }
+      });
+      return (2 * hits) / (a.length + bigrams(nameB).length);
     }
 
     function metaList(product, key) {
@@ -679,29 +742,55 @@
       return Math.abs(h);
     }
 
-    // Higher is more alike: shared category > shared tags > shared name words,
-    // nudged by how close the two prices sit.
-    function similarity(a, b) {
-      let score = 0;
+    // 0 to ~1.25. How alike the two names read is the whole signal; category,
+    // tags and price only break ties between names that score the same.
+    function similarity(current, other, weights) {
+      let score = 0.75 * nameOverlap(nameTokens(current.name), nameTokens(other.name), weights)
+                + 0.25 * spellingOverlap(current.name, other.name);
 
-      const catsA = metaList(a, 'category');
-      const catsB = metaList(b, 'category');
-      if (catsA.some(c => catsB.includes(c))) score += 4;
+      const catsA = metaList(current, 'category');
+      const catsB = metaList(other, 'category');
+      if (catsA.some(c => catsB.includes(c))) score += 0.15;
 
-      const tagsA = metaList(a, 'tags');
-      metaList(b, 'tags').forEach(t => { if (tagsA.includes(t)) score += 2; });
+      const tagsA = metaList(current, 'tags');
+      metaList(other, 'tags').forEach(t => { if (tagsA.includes(t)) score += 0.05; });
 
-      const wordsA = nameTokens(a);
-      nameTokens(b).forEach(t => { if (wordsA.includes(t)) score += 3; });
-
-      const highest = Math.max(a.price || 0, b.price || 0);
+      const highest = Math.max(current.price || 0, other.price || 0);
       if (highest > 0) {
-        score += 2 * (1 - Math.abs((a.price || 0) - (b.price || 0)) / highest);
+        score += 0.05 * (1 - Math.abs((current.price || 0) - (other.price || 0)) / highest);
       }
 
-      // Sub-0.1 jitter, stable per pair, so shops where everything scores the
-      // same don't surface an identical row on every product page.
-      return score + (hashCode(String(a.id) + ':' + String(b.id)) % 100) / 1000;
+      // Hair-thin, stable per pair: only decides between candidates that are
+      // otherwise identical, so a catalog with nothing to go on still varies.
+      return score + (hashCode(String(current.id) + ':' + String(other.id)) % 100) / 1e5;
+    }
+
+    function pickRelated(catalog, current) {
+      const weights = buildWordWeights(catalog);
+      const ranked  = catalog
+        .filter(p => String(p.id) !== String(current.id) && p.active !== false)
+        .map((p, i) => ({ product: p, i, score: similarity(current, p, weights) }))
+        .sort((a, b) => b.score - a.score || a.i - b.i);
+
+      const picks = [];
+      const usedNames = new Map();
+      ranked.forEach(entry => {
+        if (picks.length >= RELATED_LIMIT) return;
+        const key  = nameTokens(entry.product.name).sort().join(' ');
+        const used = usedNames.get(key) || 0;
+        if (used >= MAX_PER_NAME) return;
+        usedNames.set(key, used + 1);
+        picks.push(entry.product);
+      });
+
+      // A catalog of one repeated title would come up short above — top it back
+      // up in score order rather than showing a half-empty row.
+      ranked.forEach(entry => {
+        if (picks.length < RELATED_LIMIT && !picks.includes(entry.product)) {
+          picks.push(entry.product);
+        }
+      });
+      return picks;
     }
 
     async function fetchAllProducts() {
@@ -723,14 +812,7 @@
       const section = document.getElementById('related');
       const grid    = document.getElementById('related-grid');
       try {
-        const all   = await fetchAllProducts();
-        const picks = all
-          .filter(p => String(p.id) !== String(current.id) && p.active !== false)
-          .map((p, i) => ({ product: p, i, score: similarity(current, p) }))
-          .sort((a, b) => b.score - a.score || a.i - b.i)
-          .slice(0, RELATED_LIMIT)
-          .map(s => s.product);
-
+        const picks = pickRelated(await fetchAllProducts(), current);
         if (!picks.length) return;
 
         grid.innerHTML = picks.map(p => {
