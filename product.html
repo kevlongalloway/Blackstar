@@ -71,6 +71,7 @@
       overflow: hidden;
       width: 100%;
       margin-bottom: 32px;
+      position: relative;
     }
     @media (min-width: 768px) { .product-image { margin-bottom: 0; } }
     .product-image img {
@@ -89,6 +90,70 @@
       font-size: 48px;
       letter-spacing: 0.2em;
     }
+
+    /* Swipable gallery */
+    .gallery-track {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .gallery-track::-webkit-scrollbar { display: none; }
+    .gallery-slide {
+      flex: 0 0 100%;
+      width: 100%;
+      height: 100%;
+      scroll-snap-align: start;
+    }
+    .gallery-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    .gallery-dots {
+      position: absolute;
+      left: 0; right: 0; bottom: 14px;
+      display: flex;
+      justify-content: center;
+      gap: 7px;
+      z-index: 2;
+      pointer-events: none;
+    }
+    .gallery-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(240,237,232,0.35);
+      transition: background 0.25s, transform 0.25s;
+    }
+    .gallery-dot.active { background: #f0ede8; transform: scale(1.3); }
+
+    .gallery-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 40px;
+      height: 40px;
+      background: rgba(8,8,8,0.45);
+      color: #f0ede8;
+      border: none;
+      font-family: 'Space Mono', monospace;
+      font-size: 20px;
+      line-height: 1;
+      cursor: crosshair;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s;
+      z-index: 3;
+    }
+    .product-image:hover .gallery-arrow { opacity: 0.7; }
+    .gallery-arrow:hover { opacity: 1; }
+    .gallery-arrow.prev { left: 8px; }
+    .gallery-arrow.next { right: 8px; }
+    @media (hover: none) { .gallery-arrow { display: none; } }
 
     /* Info */
     .product-info { position: sticky; top: 100px; }
@@ -217,6 +282,46 @@
     }
     .btn-buy:hover { opacity: 0.6; }
 
+    /* Size selector */
+    .size-row { margin-bottom: 20px; }
+    .size-label {
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      opacity: 0.35;
+      margin-bottom: 10px;
+    }
+    .size-options { display: flex; flex-wrap: wrap; gap: 8px; }
+    .size-btn {
+      background: none;
+      border: 1px solid rgba(240,237,232,0.2);
+      color: #f0ede8;
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      min-width: 44px;
+      height: 44px;
+      padding: 0 10px;
+      cursor: crosshair;
+      opacity: 0.6;
+      text-transform: uppercase;
+      transition: opacity 0.2s, border-color 0.2s, background 0.2s, color 0.2s;
+    }
+    .size-btn:hover { opacity: 1; border-color: rgba(240,237,232,0.5); }
+    .size-btn.selected {
+      background: #f0ede8;
+      color: #080808;
+      border-color: #f0ede8;
+      opacity: 1;
+    }
+    .size-error {
+      font-size: 9px;
+      letter-spacing: 0.15em;
+      color: #e84040;
+      margin-bottom: 12px;
+      display: none;
+    }
+
     /* Toast */
     .toast {
       position: fixed;
@@ -234,6 +339,69 @@
       white-space: nowrap;
     }
     .toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* Products you may like */
+    .related {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px 100px;
+    }
+    @media (min-width: 640px) { .related { padding: 0 40px 120px; } }
+
+    .related-label {
+      font-size: 9px;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      opacity: 0.35;
+      padding-bottom: 20px;
+      margin-bottom: 28px;
+      border-bottom: 1px solid rgba(240,237,232,0.08);
+    }
+
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    @media (min-width: 640px) {
+      .related-grid { grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    }
+
+    .card {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      min-width: 0;
+    }
+    .card-img {
+      aspect-ratio: 3/4;
+      background: #121212;
+      overflow: hidden;
+    }
+    .card-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+    .card:hover .card-img img { transform: scale(1.06); }
+    .card-img .product-image-placeholder { font-size: 20px; }
+
+    .card-info { padding: 12px 2px 4px; }
+    .card-name {
+      display: block;
+      font-size: 10px;
+      letter-spacing: 0.04em;
+      margin-bottom: 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .card-price {
+      display: block;
+      font-size: 10px;
+      opacity: 0.45;
+    }
 
     /* Loading / error */
     .state-msg {
@@ -275,6 +443,18 @@
     }
     .footer-links a:hover { opacity: 1; }
     .footer-copy { font-size: 9px; opacity: 0.3; letter-spacing: 0.1em; }
+
+    .footer-bottom {
+      background: #080808;
+      color: #f0ede8;
+      text-align: center;
+      padding: 12px 16px;
+      font-size: 9px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+    .footer-bottom a { color: inherit; text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -283,8 +463,9 @@
     <a class="nav-mark" href="index.html">BST★</a>
     <div class="nav-links">
       <a href="products.html">Shop</a>
-      <a href="#">Drops</a>
-      <a href="#">About</a>
+      <!-- <a href="#">Drops</a> -->
+      <a href="about.html">About</a>
+      <a href="archive.html">Archive</a>
       <a href="cart.html" class="cart-nav-link">Cart</a>
     </div>
   </nav>
@@ -292,6 +473,11 @@
   <div class="product-page" id="product-page">
     <p class="state-msg" id="state">Loading...</p>
   </div>
+
+  <section class="related" id="related" hidden>
+    <p class="related-label">— Products You May Like</p>
+    <div class="related-grid" id="related-grid"></div>
+  </section>
 
   <div class="toast" id="toast"></div>
 
@@ -308,6 +494,11 @@
     <p class="footer-copy">© 2026 BLACKSTAR</p>
   </footer>
 
+  <div class="footer-bottom">
+    © 2026, BlackStar the Brand Powered by <a href="https://upcart.online" target="_blank" rel="noopener">upcart.online</a>
+  </div>
+
+  <script src="config.js"></script>
   <script src="cart.js"></script>
   <script>
     const params    = new URLSearchParams(location.search);
@@ -330,15 +521,40 @@
     function render(product) {
       const page   = document.getElementById('product-page');
       const stock  = stockLabel(product);
-      const image  = product.images && product.images[0] ? product.images[0] : null;
+      const images = Array.isArray(product.images) ? product.images.filter(Boolean) : [];
       const avail  = product.active && (product.stock === -1 || product.stock > 0);
+      // Support metadata.variants [{size,stock},...] (from admin UI)
+      // and metadata.sizes ["S","M",...] (flat array) as fallback
+      const _variants = product.metadata && Array.isArray(product.metadata.variants) && product.metadata.variants.length > 0
+                          ? product.metadata.variants.map(v => v.size).filter(Boolean) : null;
+      const sizes = _variants && _variants.length > 0
+                      ? _variants
+                      : (product.metadata && Array.isArray(product.metadata.sizes) && product.metadata.sizes.length > 0
+                          ? product.metadata.sizes : null);
+
+      let imageMarkup;
+      if (images.length > 1) {
+        const slides = images.map(src =>
+          `<div class="gallery-slide"><img src="${src}" alt="${product.name}"></div>`
+        ).join('');
+        const dots = images.map((_, i) =>
+          `<span class="gallery-dot${i === 0 ? ' active' : ''}"></span>`
+        ).join('');
+        imageMarkup = `
+            <div class="gallery-track">${slides}</div>
+            <button type="button" class="gallery-arrow prev" aria-label="Previous image">‹</button>
+            <button type="button" class="gallery-arrow next" aria-label="Next image">›</button>
+            <div class="gallery-dots">${dots}</div>`;
+      } else if (images.length === 1) {
+        imageMarkup = `<img src="${images[0]}" alt="${product.name}">`;
+      } else {
+        imageMarkup = `<div class="product-image-placeholder">BST★</div>`;
+      }
 
       page.innerHTML = `
         <div class="product-layout">
           <div class="product-image">
-            ${image
-              ? `<img src="${image}" alt="${product.name}">`
-              : `<div class="product-image-placeholder">BST★</div>`}
+            ${imageMarkup}
           </div>
           <div class="product-info">
             <a href="products.html" class="product-back">← All Products</a>
@@ -346,6 +562,15 @@
             <p class="product-price">${formatPrice(product.price, product.currency)}</p>
             <p class="product-stock ${stock.cls}">${stock.text}</p>
             ${product.description ? `<p class="product-desc">${product.description}</p>` : ''}
+            ${sizes ? `
+            <div class="size-row">
+              <p class="size-label">Size</p>
+              <div class="size-options">
+                ${sizes.map(s => `<button class="size-btn" data-size="${s}">${s}</button>`).join('')}
+              </div>
+            </div>
+            <p class="size-error" id="size-error">Please select a size</p>
+            ` : ''}
             <div class="qty-row">
               <button class="qty-btn" id="qty-minus" aria-label="Decrease">−</button>
               <input class="qty-val" id="qty-val" type="number" value="1" min="1" max="${product.stock === -1 ? 99 : product.stock || 1}">
@@ -361,6 +586,7 @@
       // Quantity controls
       const qtyInput = document.getElementById('qty-val');
       const maxQty   = product.stock === -1 ? 99 : (product.stock || 1);
+      let selectedSize = null;
 
       document.getElementById('qty-minus').addEventListener('click', () => {
         qtyInput.value = Math.max(1, parseInt(qtyInput.value, 10) - 1);
@@ -369,12 +595,245 @@
         qtyInput.value = Math.min(maxQty, parseInt(qtyInput.value, 10) + 1);
       });
 
+      // Size selection
+      if (sizes) {
+        page.querySelectorAll('.size-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            page.querySelectorAll('.size-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedSize = btn.dataset.size;
+            const errEl = document.getElementById('size-error');
+            if (errEl) errEl.style.display = 'none';
+          });
+        });
+      }
+
       // Add to cart
       document.getElementById('btn-add').addEventListener('click', () => {
+        if (sizes && !selectedSize) {
+          const errEl = document.getElementById('size-error');
+          if (errEl) errEl.style.display = 'block';
+          return;
+        }
         const qty = parseInt(qtyInput.value, 10) || 1;
-        addToCart(product, qty);
+        addToCart(product, qty, selectedSize);
         showToast('Added to cart');
       });
+
+      // Swipable image gallery
+      initGallery(page);
+
+      // Products you may like
+      loadRelated(product);
+    }
+
+    function initGallery(page) {
+      const track = page.querySelector('.gallery-track');
+      if (!track) return;
+      const dots = Array.from(page.querySelectorAll('.gallery-dot'));
+      const prev = page.querySelector('.gallery-arrow.prev');
+      const next = page.querySelector('.gallery-arrow.next');
+      const count = dots.length;
+      const currentIndex = () => Math.round(track.scrollLeft / track.clientWidth);
+
+      let raf = null;
+      track.addEventListener('scroll', () => {
+        if (raf) return;
+        raf = requestAnimationFrame(() => {
+          raf = null;
+          const i = currentIndex();
+          dots.forEach((d, di) => d.classList.toggle('active', di === i));
+        });
+      });
+
+      const goTo = i => {
+        const clamped = Math.max(0, Math.min(count - 1, i));
+        track.scrollTo({ left: clamped * track.clientWidth, behavior: 'smooth' });
+      };
+      if (prev) prev.addEventListener('click', () => goTo(currentIndex() - 1));
+      if (next) next.addEventListener('click', () => goTo(currentIndex() + 1));
+    }
+
+    // ─── Products you may like ─────────────────────────────────────────────
+    const RELATED_LIMIT = 4;
+    // At most this many pieces sharing one name, so a title the shop lists
+    // several times ("Reworked Jean Jackets") can't fill the whole row.
+    const MAX_PER_NAME = 2;
+    // Words that say nothing about what a piece is.
+    const STOP_WORDS = new Set(['the', 'and', 'for', 'with', 'blackstar', 'bst', 'size', 'new']);
+
+    // Crude singular-ise so "jackets" matches "jacket", "jeans" matches "jean".
+    function stem(token) {
+      if (token.length > 4 && token.endsWith('ies')) return token.slice(0, -3) + 'y';
+      if (token.length > 4 && token.endsWith('es'))  return token.slice(0, -2);
+      if (token.length > 3 && token.endsWith('s'))   return token.slice(0, -1);
+      return token;
+    }
+
+    // '"Red" Reconstructed Jeans' -> ['red', 'reconstructed', 'jean']
+    function nameTokens(name) {
+      return String(name || '')
+        .toLowerCase()
+        .split(/[^a-z0-9]+/)
+        .filter(t => t.length > 1 && !STOP_WORDS.has(t))
+        .map(stem);
+    }
+
+    // A word most of the catalog shares ("red" when nearly every piece is from
+    // the Red collection) says far less about similarity than a rare one
+    // ("bucket", "skirt"), so weight each word by how uncommon it is. Without
+    // this every Red piece ties with every other Red piece and the row stops
+    // depending on which product you are looking at.
+    function buildWordWeights(catalog) {
+      const appearsIn = new Map();
+      catalog.forEach(p => {
+        new Set(nameTokens(p.name)).forEach(t => appearsIn.set(t, (appearsIn.get(t) || 0) + 1));
+      });
+      const weights = new Map();
+      appearsIn.forEach((count, t) => {
+        weights.set(t, Math.log((catalog.length + 1) / (count + 1)) + 0.1);
+      });
+      return weights;
+    }
+
+    // Share of weight the two names hold in common, 0 (nothing) to 1 (same
+    // words). Dividing by both totals keeps long names from winning on length.
+    function nameOverlap(tokensA, tokensB, weights) {
+      const setA = new Set(tokensA);
+      const setB = new Set(tokensB);
+      const weightOf = t => (weights.get(t) || 1);
+      let shared = 0, totalA = 0, totalB = 0;
+      setA.forEach(t => { totalA += weightOf(t); if (setB.has(t)) shared += weightOf(t); });
+      setB.forEach(t => { totalB += weightOf(t); });
+      return totalA + totalB === 0 ? 0 : (2 * shared) / (totalA + totalB);
+    }
+
+    function bigrams(name) {
+      const flat = String(name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+      const pairs = [];
+      for (let i = 0; i < flat.length - 1; i++) pairs.push(flat.slice(i, i + 2));
+      return pairs;
+    }
+
+    // Letter-level overlap, which catches near-misses whole words miss —
+    // "Denim Tie-Dye Long Skirt" against "Denim Tie- Dye Crop Tee".
+    function spellingOverlap(nameA, nameB) {
+      const a = bigrams(nameA);
+      const pool = bigrams(nameB);
+      if (!a.length || !pool.length) return 0;
+      let hits = 0;
+      a.forEach(pair => {
+        const at = pool.indexOf(pair);
+        if (at >= 0) { pool.splice(at, 1); hits++; }
+      });
+      return (2 * hits) / (a.length + bigrams(nameB).length);
+    }
+
+    function metaList(product, key) {
+      const val = product.metadata && product.metadata[key];
+      if (Array.isArray(val)) return val.map(v => String(v).toLowerCase());
+      if (typeof val === 'string' && val) return [val.toLowerCase()];
+      return [];
+    }
+
+    function hashCode(str) {
+      let h = 0;
+      for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) | 0;
+      return Math.abs(h);
+    }
+
+    // 0 to ~1.25. How alike the two names read is the whole signal; category,
+    // tags and price only break ties between names that score the same.
+    function similarity(current, other, weights) {
+      let score = 0.75 * nameOverlap(nameTokens(current.name), nameTokens(other.name), weights)
+                + 0.25 * spellingOverlap(current.name, other.name);
+
+      const catsA = metaList(current, 'category');
+      const catsB = metaList(other, 'category');
+      if (catsA.some(c => catsB.includes(c))) score += 0.15;
+
+      const tagsA = metaList(current, 'tags');
+      metaList(other, 'tags').forEach(t => { if (tagsA.includes(t)) score += 0.05; });
+
+      const highest = Math.max(current.price || 0, other.price || 0);
+      if (highest > 0) {
+        score += 0.05 * (1 - Math.abs((current.price || 0) - (other.price || 0)) / highest);
+      }
+
+      // Hair-thin, stable per pair: only decides between candidates that are
+      // otherwise identical, so a catalog with nothing to go on still varies.
+      return score + (hashCode(String(current.id) + ':' + String(other.id)) % 100) / 1e5;
+    }
+
+    function pickRelated(catalog, current) {
+      const weights = buildWordWeights(catalog);
+      const ranked  = catalog
+        .filter(p => String(p.id) !== String(current.id) && p.active !== false)
+        .map((p, i) => ({ product: p, i, score: similarity(current, p, weights) }))
+        .sort((a, b) => b.score - a.score || a.i - b.i);
+
+      const picks = [];
+      const usedNames = new Map();
+      ranked.forEach(entry => {
+        if (picks.length >= RELATED_LIMIT) return;
+        const key  = nameTokens(entry.product.name).sort().join(' ');
+        const used = usedNames.get(key) || 0;
+        if (used >= MAX_PER_NAME) return;
+        usedNames.set(key, used + 1);
+        picks.push(entry.product);
+      });
+
+      // A catalog of one repeated title would come up short above — top it back
+      // up in score order rather than showing a half-empty row.
+      ranked.forEach(entry => {
+        if (picks.length < RELATED_LIMIT && !picks.includes(entry.product)) {
+          picks.push(entry.product);
+        }
+      });
+      return picks;
+    }
+
+    async function fetchAllProducts() {
+      let all = [], offset = 0;
+      const limit = 100;
+      while (true) {
+        const res  = await fetch('https://ecommaxxing.kevlongalloway1999m.workers.dev/products?limit=' + limit + '&offset=' + offset);
+        const body = await res.json();
+        if (!body.ok) throw new Error(body.error || 'Failed to load products');
+        if (!body.data.length) break;
+        all    = all.concat(body.data);
+        offset += body.data.length;
+        if (body.data.length < limit) break;
+      }
+      return all;
+    }
+
+    async function loadRelated(current) {
+      const section = document.getElementById('related');
+      const grid    = document.getElementById('related-grid');
+      try {
+        const picks = pickRelated(await fetchAllProducts(), current);
+        if (!picks.length) return;
+
+        grid.innerHTML = picks.map(p => {
+          const image = p.images && p.images[0] ? p.images[0] : null;
+          return `
+          <a href="product.html?id=${p.id}" class="card">
+            <div class="card-img">
+              ${image
+                ? `<img src="${image}" alt="${p.name}" loading="lazy">`
+                : `<div class="product-image-placeholder">BST★</div>`}
+            </div>
+            <div class="card-info">
+              <span class="card-name">${p.name}</span>
+              <span class="card-price">${formatPrice(p.price, p.currency)}</span>
+            </div>
+          </a>`;
+        }).join('');
+        section.hidden = false;
+      } catch (err) {
+        console.error('Failed to load related products:', err.message);
+      }
     }
 
     async function loadProduct() {
@@ -384,7 +843,7 @@
         return;
       }
       try {
-        const res  = await fetch(API_BASE + '/products/' + productId);
+        const res  = await fetch('https://ecommaxxing.kevlongalloway1999m.workers.dev/products/' + productId);
         const body = await res.json();
         if (!body.ok) throw new Error(body.error || 'Not found');
         document.title = body.data.name + ' — BLACKSTAR';
